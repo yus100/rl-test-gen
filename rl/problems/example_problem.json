@@ -1,0 +1,12 @@
+{
+  "spec": "Write a function `add_numbers(a, b)` that takes two integers and returns their sum. The function should handle both positive and negative integers.",
+  "problem": "def add_numbers(a, b):\n    \"\"\"Add two numbers and return the result.\"\"\"\n    return a + b\n",
+  "perturbations": [
+    "def add_numbers(a, b):\n    \"\"\"Logic error: using subtraction instead of addition.\"\"\"\n    return a - b\n",
+    "def add_numbers(a, b):\n    \"\"\"Boundary error: off-by-one.\"\"\"\n    return a + b + 1\n",
+    "def add_numbers(a, b):\n    \"\"\"Type error: not handling non-integer inputs.\"\"\"\n    return str(a) + str(b)\n",
+    "def add_numbers(a, b):\n    \"\"\"Incomplete: missing negative number handling.\"\"\"\n    if a < 0 or b < 0:\n        return 0\n    return a + b\n",
+    "def add_numbers(a, b):\n    \"\"\"Performance bug: unnecessarily complex.\"\"\"\n    result = 0\n    for i in range(abs(a)):\n        result += 1 if a > 0 else -1\n    for i in range(abs(b)):\n        result += 1 if b > 0 else -1\n    return result\n"
+  ]
+}
+

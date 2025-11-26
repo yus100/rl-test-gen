@@ -1,0 +1,159 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{xcolor}
+
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+
+\title{\textbf{Reinforcement Learning for Specification-Driven Test Case Generation}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Core Idea}
+
+Train a test generator using reinforcement learning where the reward signal comes from detecting synthetic bugs instead of matching human-written tests. Given only a specification and correct implementation, use an LLM to generate realistic buggy versions that violate the spec, then reward the test generator based on what percentage of these bugs its generated tests catch, creating a fully automated training loop that optimizes directly for bug detection rather than requiring expensive human-labeled test suites as ground truth.
+
+\subsection{Key Innovation}
+
+Traditional test generation approaches suffer from a circular dependency: evaluating test quality requires existing high-quality tests. This work breaks the cycle by using \emph{synthetic bugs} as an automatic, scalable evaluation signal. Rather than asking ``do generated tests match human tests?'', we ask ``do generated tests catch bugs?''—directly optimizing for the desired outcome.
+
+\section{Dataset Construction}
+
+\subsection{Source Problems}
+
+??
+
+\subsection{Perturbation Generation}
+
+Use GPT-5 or Claude Sonnet as a fixed fuzzer (no training required) to generate synthetic bugs:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Scale:} 20 perturbations per problem
+    \item \textbf{Bug Categories:} (5 types, equally distributed)
+    \begin{enumerate}
+        \item \textbf{Logic errors:} Wrong operators, incorrect conditionals
+        \item \textbf{Boundary errors:} Off-by-one, empty input mishandling
+        \item \textbf{Type errors:} Missing type checks, wrong conversions
+        \item \textbf{Incomplete implementations:} Missing edge case handling
+        \item \textbf{Performance bugs:} Inefficient or incorrect algorithms
+    \end{enumerate}
+    \item \textbf{Quality constraints:} All perturbations must be syntactically valid Python, executable without crashes on typical inputs, and represent realistic mistakes
+\end{itemize}
+
+\section{Reinforcement Learning Formulation}
+
+\subsection{RL Components}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Agent:} Qwen 3 8B
+    \item \textbf{State:} $(S, C)$ where $S$ is the specification and $C$ is the correct implementation
+    \item \textbf{Action space:} Generate complete pytest test file (autoregressive text generation)
+    \item \textbf{Algorithm:} Group Relative Policy Optimization (GRPO)
+\end{itemize}
+
+\subsection{Reward Function}
+
+Let $T$ be a generated test suite, $C$ the correct implementation, and $\{P_1, \ldots, P_n\}$ the set of $n$ perturbations. Define:
+\begin{itemize}[leftmargin=*]
+    \item $d_i = 1$ if test suite $T$ catches bug $P_i$ (at least one test fails), else $d_i = 0$
+    \item $\text{pass}(T, C)$ = true if all tests in $T$ pass on correct code $C$
+\end{itemize}
+
+The reward function is:
+\begin{equation}
+R(T) = \begin{cases} 
+-1 & \text{if } \neg\text{pass}(T, C) \text{ (false positive penalty)} \\
+\frac{1}{n}\sum_{i=1}^{n} d_i & \text{otherwise (perturbation detection rate)}
+\end{cases}
+\end{equation}
+
+\textbf{Key properties:}
+\begin{itemize}[leftmargin=*]
+    \item Bounded: $R(T) \in [-1, 1]$
+    \item Fully automatic: no human judgment required
+    \item Prevents trivial solutions: strong penalty discourages tests that reject correct code
+\end{itemize}
+
+\subsection{Training Loop}
+
+\begin{enumerate}
+    \item Sample a problem $(S, C)$ from the training dataset
+    \item Agent generates test suite $T$ autoregressively
+    \item Execute $T$ against correct code $C$ and all $n$ perturbations $\{P_i\}$
+    \item Compute reward $R(T)$
+    \item Update policy using GRPO to maximize expected reward
+\end{enumerate}
+
+\textbf{Objective:} $\displaystyle \max_\theta \mathbb{E}_{(S,C) \sim \mathcal{D}, T \sim \pi_\theta}[R(T)]$
+
+The model learns through trial and error which test patterns effectively catch bugs, guided purely by the automated reward signal.
+
+\section{Evaluation}
+
+\subsection{Primary Benchmarks}
+
+\textbf{UnleakedTestBench} \href{https://github.com/huangd1999/UnLeakedTestBench}{\underline{link}}
+
+UnLeakedTestBench is a rigorous benchmark for evaluating Large Language Models (LLMs) on function-level unit test generation. It addresses critical limitations in existing benchmarks by providing:
+
+3,909 real-world Python functions with high cyclomatic complexity ($\geq10$)
+Decontaminated dataset that mitigates test case leakage from LLM training data
+Paired benchmark design with PreLeakedTestBench for controlled contamination analysis
+
+\textbf{TestGenEval} 
+\href{https://testgeneval.github.io/}{\underline{link}}
+
+We design TestGenEval, a benchmark of 1210 Python test files and their corresponding code files. We measure a variety of metrics, including compile@k, pass@k and coverage improvement for generating the first test, last test and an additional test given the code under test.
+
+\textbf{SWT-Bench}
+\href{https://github.com/logic-star-ai/SWT-Bench}{\underline{link}}
+
+SWT-Bench is a benchmark for evaluating large language models on testing generation for real world software issues collected from GitHub. Given a codebase and an issue, a language model is tasked with generating a reproducing test that fails in the original state of the code base and passes after a patch resolving the issue has been applied.
+
+\subsection{Baselines}
+
+We compare against baselines of varying levels
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Base Model:} Direct prompting on base model
+    \item \textbf{SFT on test cases:} Directly using training data to fine tune without reward function
+    \item \textbf{RL w/ mutmut:} Using traditional mutation testing to post train the model to compare versus our specific LLM-generated perturbations
+    \item \textbf{Published methods:} Recent test generation approaches from literature (e.g., TestPilot, CodaMosa, TestGen-LLM)
+    \item \textbf{Frontier Model:} Upper bound
+\end{enumerate}
+
+\subsection{Other stats to track}
+
+\textbf{Bug category:} Identify which bug types are easiest/hardest to detect
+\begin{itemize}[leftmargin=*]
+    \item Logic errors
+    \item Boundary errors
+    \item Type errors
+    \item Incomplete implementations
+    \item Performance bugs
+\end{itemize}
+
+\textbf{Problem difficulty:} Measure performance on easy/medium/hard problems (using existing difficulty labels from HumanEval)
+
+\textbf{Test suite characteristics:}
+\begin{itemize}[leftmargin=*]
+    \item Average number of test functions generated
+    \item Average number of assertions per test
+    \item Test execution time
+\end{itemize}
+
+
+
+\end{document}

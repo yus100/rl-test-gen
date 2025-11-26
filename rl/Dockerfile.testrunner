@@ -1,0 +1,15 @@
+# lightweight python image for running pytest tests
+FROM python:3.11-slim
+
+# install pytest and common testing libs
+RUN pip install --no-cache-dir \
+    pytest==7.4.3 \
+    pytest-timeout==2.2.0 \
+    pytest-cov==4.1.0
+
+# set working directory
+WORKDIR /test_workspace
+
+# default command runs pytest
+CMD ["pytest", "-v", "--tb=short"]
+
