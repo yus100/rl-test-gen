@@ -1,0 +1,502 @@
+[
+  {
+    "id": 0,
+    "specification": "Declare queues when broker is instantiated",
+    "code": "class Broker(object):\n    def __init__(self, config):\n        self.connection = BrokerConnection(**config)\n        with producers[self.connection].acquire(block=False) as producer:\n            for queue in task_queues:\n                maybe_declare(queue, producer.channel)\n\n    def delay(self, func, *args, **kwargs):\n        payload = {\n            \"func\": func,\n            \"args\": args,\n            \"kwargs\": kwargs,\n        }\n\n        with producers[self.connection].acquire(block=False) as producer:\n            producer.publish(payload,\n                exchange=task_exchange,\n                serializer=\"pickle\",\n                compression=\"bzip2\",\n                queue='default',\n                routing_key='default',\n            )\n"
+  },
+  {
+    "id": 1,
+    "specification": "\"openweather unit tests\"",
+    "code": "def test_weather():\n    regex = u'Lappeenranta, FI: Temperature: \\d+.\\d\\xb0C, feels like: \\d+.\\d\\xb0C, wind: \\d+.\\d m/s, humidity: \\d+%, pressure: \\d+ hPa, cloudiness: \\d+%'\n    check_re(regex, module_openweather.command_weather(bot, None, \"#channel\", 'lappeenranta')[1])\n\n"
+  },
+  {
+    "id": 2,
+    "specification": "% only showing 0 or 100%, everything between goes to 0%.\n\n\nAutoconverted from SVN (revision:1548)",
+    "code": "def percentage(value, total):\n  try:\n    percentage = float(value) / float(total) * 100\n  except ZeroDivisionError:\n    percentage = 0\n  return '<abbr title=\"%s/%s\">%s%%</abbr>' % (value, total, percentage)"
+  },
+  {
+    "id": 3,
+    "specification": "\"validation\" from RejectionException docstring",
+    "code": "class AutomatonException(Exception):\n    \"\"\"The base class for all automaton-related errors.\"\"\"\n\n    pass\n\n"
+  },
+  {
+    "id": 4,
+    "specification": "Implied_group, it still refers to the old module name",
+    "code": "class AccountConfigSettings(orm.TransientModel):\n    _inherit = 'account.config.settings'\n\n    _columns = {\n        'group_use_product_description_per_inv_line': fields.boolean(\n            \"\"\"Allow using only the product description on the\n            invoice order lines\"\"\",\n            implied_group=\"account_invoice_line_description.\"\n            \"group_use_product_description_per_inv_line\",\n            help=\"\"\"Allows you to use only product description on the\n            invoice order lines.\"\"\"\n        ),\n    }"
+  },
+  {
+    "id": 5,
+    "specification": "Interpretation of parameters for names list modification",
+    "code": "class InvisibleMode(Mode):\n\tdef namesListEntry(self, recipient, channel, user, representation):\n\t\tif channel.name not in recipient.channels and \"i\" in user.mode:\n\t\t\treturn \"\"\n\t\treturn representation\n"
+  },
+  {
+    "id": 7,
+    "specification": "[FIX][11.0] Make debugger record a debug message instead of error when importing validate_email in partner_email_check",
+    "code": "    def validate_email(email):\n        _logger.warning(\n            'Can not validate email, '\n            'python dependency required \"validate_email\"')\n        return True\n\n"
+  },
+  {
+    "id": 15,
+    "specification": "Tests package and specify platforms",
+    "code": "def load(file_name):\n    here = path.dirname(path.abspath(__file__))\n    return open(path.join(here, file_name), \"r\").read()\n"
+  },
+  {
+    "id": 20,
+    "specification": "Correct the description and the dev status to stable.",
+    "code": "def read(filename):\n  with open(filename) as fin:\n    return fin.read()\n"
+  },
+  {
+    "id": 31,
+    "specification": "Allow mutiple hooks for packets",
+    "code": "class packetHook(object):\n\tdef __init__(self, pktType, pktSubtype):\n\t\tself.pktType = pktType\n\t\tself.pktSubtype = pktSubtype\n\n\tdef __call__(self, f):\n\t\tglobal packetFunctions\n\t\tif (self.pktType, self.pktSubtype) not in packetFunctions:\n\t\t\tpacketFunctions[(self.pktType, self.pktSubtype)] = []\n\t\tpacketFunctions[(self.pktType, self.pktSubtype)].append(f)\n"
+  },
+  {
+    "id": 33,
+    "specification": "Allow for use in daily.py",
+    "code": "def _genAll(d=None,quiet=''):\n\tif not d: d = '.'\n\tif not os.path.isabs(d):\n\t\td = os.path.normpath(os.path.join(os.getcwd(),d))\n\tfor p in ('reference/genreference.py',\n\t\t\t  'userguide/genuserguide.py',\n\t\t\t  'graphguide/gengraphguide.py',\n\t\t\t  '../tools/docco/graphdocpy.py'):\n\t\tos.chdir(d)\n\t\tos.chdir(os.path.dirname(p))\n\t\tos.system('%s %s %s' % (sys.executable,os.path.basename(p), quiet))\n"
+  },
+  {
+    "id": 40,
+    "specification": "Use context manager for open",
+    "code": "def get_version():\n    import re\n    with open('imbox/version.py') as version_file:\n        return re.search(r\"\"\"__version__\\s+=\\s+(['\"])(?P<version>.+?)\\1\"\"\",\n                         version_file.read()).group('version')\n\n"
+  },
+  {
+    "id": 42,
+    "specification": "Install the proper version of Django",
+    "code": "def convert_readme():\n    try:\n        check_call([\"pandoc\", \"-f\", \"markdown_github\", \"-t\",\n                    \"rst\", \"-o\", \"README.rst\", \"README.md\"])\n    except (OSError, CalledProcessError):\n        return open('README.md').read()\n\n    return open('README.rst').read()\n\n"
+  },
+  {
+    "id": 45,
+    "specification": "Pykqml dependency lower limit",
+    "code": "def main():\n    setup(name='bioagents',\n          version='0.0.1',\n          description='Biological Reasoning Agents',\n          long_description='Biological Reasoning Agents',\n          author='Benjamin Gyori',\n          author_email='benjamin_gyori@hms.harvard.edu',\n          url='http://github.com/sorgerlab/bioagents',\n          packages=find_packages(),\n          install_requires=['indra', 'pykqml>=1.2'],\n          include_package_data=True,\n          keywords=['systems', 'biology', 'model', 'pathway', 'assembler',\n                    'nlp', 'mechanism', 'biochemistry'],\n          classifiers=[\n            'Development Status :: 4 - Beta',\n            'Environment :: Console',\n            'Intended Audience :: Science/Research',\n            'License :: OSI Approved :: BSD License',\n            'Operating System :: OS Independent',\n            'Programming Language :: Python :: 3',\n            'Topic :: Scientific/Engineering :: Bio-Informatics',\n            'Topic :: Scientific/Engineering :: Chemistry',\n            'Topic :: Scientific/Engineering :: Mathematics',\n            ],\n          )\n\n"
+  },
+  {
+    "id": 52,
+    "specification": "Install static files with distutils.",
+    "code": "def find_data_files(filepath):\n    return sum([\n        [(path, [os.path.join(path, name)]) for name in names]\n            for path, _, names in os.walk(filepath)], [])\n"
+  },
+  {
+    "id": 58,
+    "specification": "Use PEP 508 version markers.",
+    "code": "def extras_require():\n    return {\n        'test': [\n            'tox>=2.0',\n            'pytest>=2.8.5',\n            'pytest-cov>=1.8.1',\n            'pytest-pep8>=1.0.6',\n        ],\n    }\n\n"
+  },
+  {
+    "id": 62,
+    "specification": "Standard Ansible exception handling",
+    "code": "def split_string(string, seperator=' '):\n    try:\n        return string.split(seperator)\n    except Exception, e:\n        raise errors.AnsibleFilterError('split plugin error: %s, string=%s' % str(e),str(string) )\n"
+  },
+  {
+    "id": 63,
+    "specification": "Modify created_at and updated_at to millisecond",
+    "code": "def valid(qs):\n    required_keys = ['title', 'comment', 'posted_by', 'localite', 'latitude', 'longitude']\n    return all([qs.has_key(k) for k in required_keys])\n"
+  },
+  {
+    "id": 64,
+    "specification": "Print result to use \",\" instead of \"+\" for context text",
+    "code": "def calculate_sum(data_sample):\n\ttotal = 0\n\tfor row in data_sample[1:]: # slice to start at row two, but I think we should only skip row 1 if we're importing the full csv (data_from_csv), but if we use the data w/ the header (my_csv) we'll be skipping a row that we're not supposed to skip (the actual first row of non-header data). \n\t\tprice = float(row[2])\n\t\ttotal += price\n\treturn total\n"
+  },
+  {
+    "id": 66,
+    "specification": "Test if default rotor encodes forward properly",
+    "code": "class RotorTestCase(unittest.TestCase):\n    def test_rotor_encoding(self):\n        rotor = Walzen(wiring='EKMFLGDQVZNTOWYHXUSPAIBRCJ', notch='Q')\n        self.assertEqual('E', rotor.encode('A'))\n\n"
+  },
+  {
+    "id": 67,
+    "specification": "Nologin in expected user shell test",
+    "code": "def test_installed_packages(host, name):\n    \"\"\"\n    Test if packages installed\n    \"\"\"\n\n    assert host.package(name).is_installed\n\n"
+  },
+  {
+    "id": 68,
+    "specification": "Some paths where to find test binary",
+    "code": "class TestBase(unittest.TestCase):\n    def get_test_binary(self):\n        \"\"\"Helper to obtain a test binary for object file testing.\n\n        FIXME Support additional, highly-likely targets or create one\n        ourselves.\n        \"\"\"\n        for d in POSSIBLE_TEST_BINARY_PATHS:\n            for lib in POSSIBLE_TEST_BINARIES:\n                path = os.path.join(d, lib)\n\n                if os.path.exists(path):\n                    return path\n\n        raise Exception('No suitable test binaries available!')\n    get_test_binary.__test__ = False"
+  },
+  {
+    "id": 69,
+    "specification": "A misspelled variable name",
+    "code": "class PluginSettings(object):\n    BROKER = 'worker.broker'\n    BACKEND = 'worker.backend'\n    API_URL = 'worker.api_url'"
+  },
+  {
+    "id": 70,
+    "specification": "Allow to clear useless instances",
+    "code": "class MakerScienceStaticContent (SingletonModel):\n    about = models.TextField(null=True, blank=True)\n    about_team = models.TextField(null=True, blank=True)\n    about_contact = models.TextField(null=True, blank=True)\n    about_faq = models.TextField(null=True, blank=True)\n    about_cgu = models.TextField(null=True, blank=True)\n\n"
+  },
+  {
+    "id": 72,
+    "specification": "Change task to create a taskHistory object",
+    "code": "def set_celery_healthcheck_last_update(self):\n    try:\n        task_history = TaskHistory.register(request=self.request, user=None)\n\n        LOG.info(\"Setting Celery healthcheck last update\")\n        CeleryHealthCheck.set_last_update()\n\n        task_history.update_status_for(TaskHistory.STATUS_SUCCESS, details=\"Finished\")\n    except Exception, e:\n        LOG.warn(\"Oopss...{}\".format(e))\n        task_history.update_status_for(TaskHistory.STATUS_ERROR, details=e)\n    finally:\n        return"
+  },
+  {
+    "id": 76,
+    "specification": "Error Message To Server",
+    "code": "def get_author(title):\n    host = 'https://www.googleapis.com/books/v1/volumes?q={}&key={}&country=US'.format(title, key)\n    request = urllib2.Request(host)\n    try:\n        response = urllib2.urlopen(request)\n    except urllib2.HTTPError, error:\n        contents = error.read()\n        print ('Received error from Books API {}'.format(contents))\n        return str(contents)\n    html = response.read()\n    author = json.loads(html)['items'][0]['volumeInfo']['authors'][0]\n    return author\n"
+  },
+  {
+    "id": 79,
+    "specification": "Regression test for variable-length pattern problem in the matcher.",
+    "code": "def test_basic_case():\n    matcher = Matcher(Vocab(\n                lex_attr_getters={LOWER: lambda string: string.lower()}))\n    IS_ANY_TOKEN = matcher.vocab.add_flag(lambda x: True)\n    matcher.add_pattern(\n        \"FarAway\",\n        [\n            {LOWER: \"bob\"},\n            {'OP': '*', LOWER: 'and'},\n            {LOWER: 'frank'}\n        ])\n    doc = Doc(matcher.vocab, words=['bob', 'and', 'and', 'frank'])\n    match = matcher(doc)\n    assert len(match) == 1\n    ent_id, label, start, end = match[0]\n    assert start == 0\n    assert end == 4\n"
+  },
+  {
+    "id": 81,
+    "specification": "Error in loading trees",
+    "code": "class TreeIndex:\n\n\tdef __init__(self,tree_newick_fn,format=DEFAULT_FORMAT):\n\t\tself.tree_newick_fn=tree_newick_fn\n\t\tself.tree=Tree(tree_newick_fn,format=format)\n\n\tdef process_node(self,node):\n\t\tif node.is_leaf():\n\t\t\tif hasattr(node,\"fastapath\"):\n\t\t\t\tfastas_fn=node.fastapath.split(\"@\")\n\t\t\t\tfor fasta_fn in fastas_fn:\n\t\t\t\t\tprint(fasta_fn)\n\n\t\telse:\n\t\t\tchildren=node.get_children()\n\n\t\t\tfor child in children:\n\t\t\t\tself.process_node(child)\n\n\n"
+  },
+  {
+    "id": 82,
+    "specification": "Getdoctarget to ignore comment lines",
+    "code": "def get_version_string():\n    fn = py.path.local(__file__).join(\"..\", \"..\", \"..\",\n                                      \"_pytest\", \"__init__.py\")\n    for line in fn.readlines():\n        if \"version\" in line and not line.strip().startswith('#'):\n            return eval(line.split(\"=\")[-1])\n"
+  },
+  {
+    "id": 84,
+    "specification": "Bug with 'all' argument",
+    "code": "def generate_asset(resource, out_storage: ExplanationStorage):\n    out_storage.clear()\n    for explanation in resource:\n        r = copy(explanation)\n        for functor in resource.modifiers:\n            if r is None:\n                break\n            r = functor(r)\n        if r is not None:\n            out_storage.add_entry(r)\n\n"
+  },
+  {
+    "id": 85,
+    "specification": "Siblings to forum serializer",
+    "code": "class ForumSerializer(serializers.ModelSerializer):\n    description = serializers.SerializerMethodField()\n    previous_sibling = serializers.SerializerMethodField()\n    next_sibling = serializers.SerializerMethodField()\n\n    class Meta:\n        model = Forum\n        fields = [\n            'id', 'name', 'slug', 'type', 'description', 'image', 'link', 'link_redirects',\n            'posts_count', 'topics_count', 'link_redirects_count', 'last_post_on',\n            'display_sub_forum_list', 'lft', 'rght', 'tree_id', 'level', 'parent',\n            'previous_sibling', 'next_sibling',\n        ]\n\n    def get_description(self, obj):\n        return obj.description.rendered\n\n    def get_previous_sibling(self, obj):\n        sibling = obj.get_previous_sibling()\n        return sibling.pk if sibling else None\n\n    def get_next_sibling(self, obj):\n        sibling = obj.get_next_sibling()\n        return sibling.pk if sibling else None"
+  },
+  {
+    "id": 86,
+    "specification": "The parallel env variable test to reset the env correctly",
+    "code": "class TestParallelEnvVariable(unittest.TestCase):\n    \"\"\"\n    Tests environment variables related to the underlying \"parallel\"\n    functions for npyufuncs.\n    \"\"\"\n\n    _numba_parallel_test_ = False\n\n    def test_num_threads_variable(self):\n        \"\"\"\n        Tests the NUMBA_NUM_THREADS env variable behaves as expected.\n        \"\"\"\n        key = 'NUMBA_NUM_THREADS'\n        current = str(getattr(env, key, config.NUMBA_DEFAULT_NUM_THREADS))\n        threads = \"3154\"\n        env[key] = threads\n        try:\n            config.reload_config()\n        except RuntimeError as e:\n            # This test should fail if threads have already been launched\n            self.assertIn(\"Cannot set NUMBA_NUM_THREADS\", e.args[0])\n        else:\n            self.assertEqual(threads, str(get_thread_count()))\n            self.assertEqual(threads, str(config.NUMBA_NUM_THREADS))\n        finally:\n            # reset the env variable/set to default. Should not fail even if\n            # threads are launched because the value is the same.\n            env[key] = current\n            config.reload_config()\n"
+  },
+  {
+    "id": 87,
+    "specification": "Min_price and max_price fields",
+    "code": "def main():\n    client = MongoClient()\n    db = client.cityhotspots\n    db.drop_collection('dineroptions')\n    diners_collection = db.diners\n\n    doc = {}\n    diner_options_collection = db.dineroptions\n    doc['categories'] = diners_collection.distinct('category')\n    doc['cuisines'] = diners_collection.distinct('cuisine')\n    doc['districts'] = diners_collection.distinct('address.district')\n\n    doc['max_price'] = list(diners_collection.aggregate([{\n        \"$group\":\n            {\n                \"_id\": None,\n                \"max\": {\"$max\": \"$price_max\"}\n            }\n    }]))[0]['max']\n    doc['min_price'] = list(diners_collection.aggregate([{\n        \"$group\":\n            {\n                \"_id\": None,\n                \"min\": {\"$min\": \"$price_min\"}\n            }\n    }]))[0]['min']\n    \n    diner_options_collection.insert(doc)\n\n"
+  },
+  {
+    "id": 88,
+    "specification": "Load user from migration registry when creating system user",
+    "code": "def add_user(apps, *args):\n    User = apps.get_model('ideascube', 'User')\n    User(serial='__system__', full_name='System', password='!!').save()\n\n"
+  },
+  {
+    "id": 89,
+    "specification": "The scenario plugin sample",
+    "code": "class ScenarioPlugin(scenario.OpenStackScenario):\n    \"\"\"Sample plugin which lists flavors.\"\"\"\n\n    @atomic.action_timer(\"list_flavors\")\n    def _list_flavors(self):\n        \"\"\"Sample of usage clients - list flavors\n\n        You can use self.context, self.admin_clients and self.clients which are\n        initialized on scenario instance creation.\n        \"\"\"\n        self.clients(\"nova\").flavors.list()\n\n    @atomic.action_timer(\"list_flavors_as_admin\")\n    def _list_flavors_as_admin(self):\n        \"\"\"The same with admin clients.\"\"\"\n        self.admin_clients(\"nova\").flavors.list()\n\n    @scenario.configure()\n    def list_flavors(self):\n        \"\"\"List flavors.\"\"\"\n        self._list_flavors()\n        self._list_flavors_as_admin()"
+  },
+  {
+    "id": 90,
+    "specification": "Break out dispatch, and drop prepare. Easier testing",
+    "code": "class View:\n\n    def __call__(self, event, context):\n        kwargs = event.get('pathParameters') or {}\n        self.dispatch(request, **kwargs)\n\n    def dispatch(self, request, **kwargs):\n        func = getattr(self, request.method.lower())\n        try:\n            resp = func(request, **kwargs)\n        except:\n            import traceback\n            log.error(self)\n            log.error(traceback.format_exc())\n            return response(body='Internal server Error', status=500)\n        if isinstance(resp, Response):\n            resp = resp.render()\n        return resp\n\n    def prepare(self, request):\n        pass"
+  },
+  {
+    "id": 91,
+    "specification": "Check stdout with --debug for actual ddl",
+    "code": "class TestBigqueryAdapterSpecific(DBTIntegrationTest):\n\n    @property\n    def schema(self):\n        return \"bigquery_test_022\"\n\n    @property\n    def models(self):\n        return \"adapter-specific-models\"\n\n    @property\n    def profile_config(self):\n        return self.bigquery_profile()\n\n    @property\n    def project_config(self):\n        return yaml.safe_load(textwrap.dedent('''\\\n        config-version: 2\n        models:\n            test:\n                materialized: table\n                expiring_table:\n                    time_to_expiration: 4    \n        '''))\n\n    @use_profile('bigquery')\n    def test_bigquery_time_to_expiration(self):\n        _, stdout = self.run_dbt_and_capture(['run', '--debug'])\n        \n        self.assertIn(\n            'expiration_timestamp: TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL '\n            '4 hour)', stdout)"
+  },
+  {
+    "id": 92,
+    "specification": "Tf session not being set as default",
+    "code": "class TensorFlowKernel(Kernel):\n    def __init__(self, config):\n        # If this is a CPU kernel, tell TF that it should not use\n        # any GPUs for its graph operations\n        cpu_only = True\n        visible_device_list = []\n        tf_config = tf.ConfigProto()\n        for handle in config.devices:\n            if handle.type == DeviceType.GPU.value:\n                visible_device_list.append(str(handle.id))\n                cpu_only = False\n        if cpu_only:\n            tf_config.device_count['GPU'] = 0\n        else:\n            tf_config.gpu_options.visible_device_list = ','.join(visible_device_list)\n        # TODO: wrap this in \"with device\"\n        self.config = config\n        self.tf_config = tf_config\n        self.graph = self.build_graph()\n        self.sess = tf.Session(config=self.tf_config, graph=self.graph)\n        self.sess.as_default()\n        self.protobufs = config.protobufs\n\n    def close(self):\n        self.sess.close()\n\n    def build_graph(self):\n        raise NotImplementedError\n\n    def execute(self):\n        raise NotImplementedError"
+  },
+  {
+    "id": 93,
+    "specification": "Allow SiteOption to load into the JS",
+    "code": "def trunkplayer_js_config(user):\n    js_settings = getattr(settings, 'JS_SETTINGS', None)\n    js_json = {}\n    if js_settings:\n        for setting in js_settings:\n                set_val = getattr(settings, setting, '')\n                js_json[setting] = set_val\n    for opt in SiteOption.objects.filter(javascript_visible=True):\n        js_json[opt.name] = opt.value_boolean_or_string()\n    js_json['user_is_staff'] = user.is_staff\n    if user.is_authenticated():\n        js_json['user_is_authenticated'] = True\n    else:\n        js_json['user_is_authenticated'] = False\n    js_json['radio_change_unit'] = user.has_perm('radio.change_unit')\n    return json.dumps(js_json)"
+  },
+  {
+    "id": 94,
+    "specification": "Use commit suggestion to use types",
+    "code": "def keys(tmp_path):\n    pub_key = tmp_path / \"ssh\" / \"testkey.pub\"\n    priv_key = tmp_path / \"ssh\" / \"testkey\"\n    return types.SimpleNamespace(pub_key=pub_key, priv_key=priv_key)\n\n"
+  },
+  {
+    "id": 96,
+    "specification": "Set default values for fields",
+    "code": "class ITodo(model.Schema):\n    title = schema.TextLine(\n        title=u\"Title\",\n        required=False,\n        description=u\"It's a title\",\n        default=u''\n    )\n    done = schema.Bool(\n        title=u\"Done\",\n        required=False,\n        description=u\"Has the task been completed?\",\n        default=False\n    )\n\n"
+  },
+  {
+    "id": 98,
+    "specification": "Refresh system instead of clobbering it",
+    "code": "def UpdateTrustedSystem(file_name):\n    \"\"\"Make sure the TrustedSystem object is up to date.\"\"\"\n    global my_system\n    if 'my_system' not in globals():\n        my_system = libvtd.trusted_system.TrustedSystem()\n        my_system.AddFile(file_name)\n    my_system.Refresh()"
+  },
+  {
+    "id": 100,
+    "specification": "Zulipinternal migration corner case.",
+    "code": "def rename_zulip_realm_to_zulipinternal(apps: StateApps, schema_editor: DatabaseSchemaEditor) -> None:\n    if not settings.PRODUCTION:\n        return\n\n    Realm = apps.get_model('zerver', 'Realm')\n    UserProfile = apps.get_model('zerver', 'UserProfile')\n\n    if Realm.objects.count() == 0:\n        # Database not yet populated, do nothing:\n        return\n\n    if Realm.objects.filter(string_id=\"zulipinternal\").exists():\n        return\n    if not Realm.objects.filter(string_id=\"zulip\").exists():\n        # If the user renamed the `zulip` system bot realm (or deleted\n        # it), there's nothing for us to do.\n        return\n\n    internal_realm = Realm.objects.get(string_id=\"zulip\")\n\n    # For safety, as a sanity check, verify that \"internal_realm\" is indeed the realm for system bots:\n    welcome_bot = UserProfile.objects.get(email=\"welcome-bot@zulip.com\")\n    assert welcome_bot.realm.id == internal_realm.id\n\n    internal_realm.string_id = \"zulipinternal\"\n    internal_realm.name = \"System use only\"\n    internal_realm.save()\n"
+  },
+  {
+    "id": 101,
+    "specification": "Use a real path when testing sites.",
+    "code": "class TestSite(TestCase):\n\n    def test_finds_valid_site_root_from_templates(self):\n        original = os.getcwd()\n        valid_site = os.path.realpath(tempfile.mkdtemp())\n        open(os.path.join(valid_site, 'template.html'), 'w').close()\n        os.chdir(valid_site)\n\n        site = Site()\n\n        self.assertEqual(valid_site, site.path)\n        os.chdir(original)\n\n    def test_finds_valid_site_root_from_conf(self):\n        original = os.getcwd()\n        valid_site = os.path.realpath(tempfile.mkdtemp())\n        open(os.path.join(valid_site, Site.CONFIG), 'w').close()\n        os.chdir(valid_site)\n\n        site = Site()\n\n        self.assertEqual(valid_site, site.path)\n        os.chdir(original)\n\n    def test_site_has_absolute_path(self):\n        original = os.getcwd()\n        tempdir = os.path.realpath(tempfile.mkdtemp())\n        site_path = os.path.join(tempdir, 'site')\n        os.mkdir(site_path)\n        os.chdir(tempdir)\n\n        site = Site('site')\n\n        self.assertEqual(site_path, site.path)\n        os.chdir(original)"
+  },
+  {
+    "id": 103,
+    "specification": "Change Pool to use ProcessPoolExecutor",
+    "code": "class PoolMetaclass(type):\n\n    __instances__ = dict()\n    __blacklist__ = ('Pool', 'PoolMetaclass')\n\n    def __new__(cls, name, bases, attrs):\n\n        if name in cls.__blacklist__:\n            return super(PoolMetaclass, cls).__new__(cls, name,\n                                                     bases, attrs)\n\n        pool_key = attrs.get('pool_key') or '{}Pool'.format(name)\n        new_class = super(PoolMetaclass, cls).__new__(cls, pool_key,\n                                                      bases, attrs)\n\n        setattr(new_class, 'pool_key', pool_key)\n\n        if pool_key not in cls.__instances__:\n            cls.__instances__[pool_key] = new_class\n\n        return cls.__instances__[pool_key]\n\n"
+  },
+  {
+    "id": 106,
+    "specification": "Teardown of integration test",
+    "code": "class TestPropagation(object):\n    def setup_method(self, method):\n        self.servers = Group()\n\n        for port in range(4):\n            ns = MagicMock()\n            ns.port = 9812 + port\n\n            server = KittenServer(ns)\n            self.servers.spawn(server.listen_forever)\n\n    def teardown_method(self, method):\n        self.servers.kill(timeout=1)\n\n    def test_node_propagation(self):\n        \"\"\"\n        Tests that check node propagation\n\n        1) Spin up four servers.\n        2) Make the first one send a sync request to all three others.\n        3) Count the numbers of requests made.\n        4) Check databases to see that they all know each other.\n\n        \"\"\"\n\n        pass"
+  },
+  {
+    "id": 107,
+    "specification": "Change single quotes to double",
+    "code": "class TestStats(unittest.TestCase):\n\n    def test_cli(self):\n        \"\"\"\n        Test command line arguments.\n        \"\"\"\n        count = ghstats.main_cli([\"kefir500/apk-icon-editor\", \"-q\", \"-d\"])\n        self.assertTrue(count > 0)\n\n    def test_releases(self):\n        \"\"\"\n        Download all releases.\n        \"\"\"\n        stats = ghstats.download_stats(\"kefir500\", \"apk-icon-editor\", None, False, ghstats.get_env_token(), False)\n        self.assertTrue(isinstance(stats, list))\n        count = ghstats.get_stats_downloads(stats, True)\n        self.assertTrue(count > 0)\n\n    def test_release(self):\n        \"\"\"\n        Download latest release.\n        \"\"\"\n        stats = ghstats.download_stats(\"kefir500\", \"apk-icon-editor\", None, True, ghstats.get_env_token(), False)\n        self.assertTrue(isinstance(stats, dict))\n        count = ghstats.get_stats_downloads(stats, True)\n        self.assertTrue(count > 0)\n\n    def test_invalid(self):\n        \"\"\"\n        Check nonexistent repository.\n        \"\"\"\n        self.assertRaises(ghstats.GithubRepoError,\n                          lambda: ghstats.download_stats(\"kefir500\", \"foobar\", None, False,\n                                                         ghstats.get_env_token(), True))\n\n"
+  },
+  {
+    "id": 108,
+    "specification": "Match_distance flag to load_data_frame()",
+    "code": "def load_data_frame(data_frame_path, sort_reindex=False, class_labels=True, match_distance=False):\n    \"\"\"\n    Load a sentence data set as pandas DataFrame from a given path.\n\n    :param data_frame_path: the path to load the pandas DataFrame from\n    :param sort_reindex: if True, the returned data frame will be sorted by PMID and reindex by 0, 1, 2, ...\n    :param class_labels: if True, the class label is assumed to be present as the second-to-last column\n    :param match_distance: if True, the distance between the closest match is assumed to be present as the last column\n    :return: a pandas DataFrame loaded from the given path\n    \"\"\"\n    column_names = ['pmid', 'paragraph', 'sentence', 'entity1', 'entity2', 'sentence_text']\n    if class_labels:\n        column_names.append('class')\n    if match_distance:\n        column_names.append('distance')\n    data_df = pd.read_csv(data_frame_path, sep='\\t', header=None, index_col=False,\n                          names=column_names)\n    if sort_reindex:\n        data_df.sort_values('pmid', axis=0, inplace=True, kind='mergesort')\n        data_df.reset_index(inplace=True, drop=True)\n    assert data_df.isnull().sum().sum() == 0\n    return data_df"
+  },
+  {
+    "id": 109,
+    "specification": "Use the REST client get_or_create helper function.",
+    "code": "def sync_session(project, collection, subject, session, filename):\n    \"\"\"\n    Updates the qiprofile database from the XNAT database content for\n    the given session.\n\n    :param project: the XNAT project name\n    :param collection: the image collection name\n    :param subject: the subject number\n    :param session: the XNAT session number\n    :param filename: the XLS input file location\n    \"\"\"\n    # Get or create the subject database subject.\n    key = dict(project=project, collection=collection, number=subject)\n    sbj = database.get_or_create(Subject, key)\n    # Update the clinical information from the XLS input.\n    clinical.sync(sbj, filename)\n    # Update the imaging information from XNAT.\n    imaging.sync(sbj, session)"
+  },
+  {
+    "id": 111,
+    "specification": "Make (pre|post)_migrate scripts for the index table only if working on 'transient'.",
+    "code": "def create_index(sender, **kwargs):\n    if (kwargs['using'] == 'transient' and isinstance(sender, SearchConfig)):\n        create_index_table(force=True)\n\n"
+  },
+  {
+    "id": 113,
+    "specification": "Simplify the code for downloading resources.",
+    "code": "def download_resource(resources):\n    for filename, resource in resources.items():\n        print \"Downloading %s\" % filename\n\n        filename = os.path.join(config.resources_directory, filename)\n        yield downloadPage(resource['url'], filename)\n\n        if resource['action'] is not None:\n            yield defer.maybeDeferred(resource['action'],\n                                      filename,\n                                      *resource['action_args'])\n        print \"%s written.\" % filename\n\n"
+  },
+  {
+    "id": 114,
+    "specification": "Reimplement using bottle and 3 endpoints",
+    "code": "def trips_process_text():\n    body = json.load(request.body)\n    text = body.get('text')\n    tp = trips.process_text(text)\n    if tp and tp.statements:\n        stmts = json.dumps([json.loads(st.to_json()) for st\n                            in tp.statements])\n        res = {'statements': stmts}\n        return res\n    else:\n        res = {'statements': []}\n    return res\n\n"
+  },
+  {
+    "id": 117,
+    "specification": "Rename image_pub to image_publisher; change docstring.",
+    "code": "class ImageFeature(object):\n    \"\"\"\n    A ROS image Publisher/Subscriber.\n\n    \"\"\"\n    def __init__(self):\n        self.image_subscriber = rospy.Subscriber(\"/ardrone/image_raw\",\n                                                 Image, self.image_callback,\n                                                 queue_size=1)\n        self.image_publisher = rospy.Publisher(\"/output/slow_image_raw\",\n                                               Image, queue_size=1)\n        rospy.logdebug(\"Subscribed to /ardrone/image_raw\")\n        self.count = 0\n\n    def frame_callback(self, frame):\n        \"\"\"\n        Callback function of subscribed topic.\n\n        \"\"\"\n        # Publish every fifteenth frame\n        if not self.count % 15:\n            self.image_publisher.publish(frame)\n        self.count += 1\n\n"
+  },
+  {
+    "id": 118,
+    "specification": "\"x,y should be y,x\"",
+    "code": "class Person(object):\n    \"\"\"\n    Base class for all characters in game.\n    \"\"\"\n    DEFAULT_HEALTH = 100\n\n    def __init__(self, health=DEFAULT_HEALTH, position):\n        \"\"\"\n        Defaults to facing north. Facing codes:\n        - 0: North\n        - 1: East\n        - 2: South\n        - 3: West\n\n        @param health The health that is given at init.\n        @param position [x, y] the position at init.\n        \"\"\"\n        if not isinstance(position, (tuple, list)):\n            logging.error(\n                \"Position should be tuple/list with [x, y], set it to [0, 0]\"\n            )\n            position = [0, 0]\n\n        self.health, self.position, self.facing = health, position, 0\n"
+  },
+  {
+    "id": 119,
+    "specification": "\"moving httpresponse to view\"",
+    "code": "def restore(request):\n    user = User.from_django_user(request.user)\n    restore_id = request.GET.get('since')\n    return generate_restore_response(user, restore_id)\n    \n"
+  },
+  {
+    "id": 121,
+    "specification": "Adjust code to restore generality.",
+    "code": "def sin_theta_sum(variables):\r\n    theta = 0\r\n    for var in variables:\r\n        theta += var\r\n    return np.sin(theta)\r\n\r\n\r"
+  },
+  {
+    "id": 122,
+    "specification": "Correct the unit test in V5_5_0",
+    "code": "class TestPluginUtilsV550(base_plugin_utils_test.TestPluginUtilsHigherThanV5):\n\n    def setUp(self):\n        super(TestPluginUtilsV550, self).setUp()\n        self.plug_utils = pu.PluginUtilsV550()\n        self.version = \"v5_5_0\""
+  },
+  {
+    "id": 124,
+    "specification": "Return a text attribute for an hover only module",
+    "code": "def handler(q=False):\n    if q is False:\n        return False\n    print (q)\n    request = json.loads(q)\n    if not request.get('vulnerability'):\n        misperrors['error'] = 'Vulnerability id missing'\n        return misperrors\n\n    r = requests.get(cveapi_url+request.get('vulnerability'))\n    if r.status_code == 200:\n        vulnerability = json.loads(r.text)\n        if vulnerability.get('summary'):\n            summary = vulnerability['summary']\n    else:\n        misperrors['error'] = 'cve.circl.lu API not accessible'\n        return misperrors['error']\n\n    r = {'results': [{'types': mispattributes['output'], 'values': summary}]}\n    return r\n\n"
+  },
+  {
+    "id": 125,
+    "specification": "To catch up with Sublime-Linter API",
+    "code": "class PugLint(NodeLinter):\n    \"\"\"Provides an interface to pug-lint.\"\"\"\n\n    cmd = 'pug-lint ${temp_file} ${args}'\n    regex = r'^.+?:(?P<line>\\d+)(:(?P<col>\\d+) | )(?P<message>.+)'\n    multiline = False\n    tempfile_suffix = 'pug'\n    error_stream = util.STREAM_BOTH\n    defaults = {\n        'selector': 'text.pug, source.pypug, text.jade',\n        '--reporter=': 'inline'\n    }\n    default_type = WARNING"
+  },
+  {
+    "id": 126,
+    "specification": "\"empty line before class docstring\"",
+    "code": "class RamlCop(NodeLinter):\n\n    \"\"\"Provides an interface to raml-cop.\"\"\"\n\n    syntax = 'raml'\n    cmd = 'raml-cop --no-color'\n    version_requirement = '>= 1.0.0'\n    regex = (\n        r'^\\[.+:(?P<line>\\d+):(?P<col>\\d+)\\] '\n        r'(?P<message>.+)'\n    )\n    line_col_base = (0, 0)\n    tempfile_suffix = '-'"
+  },
+  {
+    "id": 128,
+    "specification": "Indention error - thought that was fixed before my last push",
+    "code": "def _eintr_retry_call(func, *args):\n\twhile True:\n\t\ttry:\n\t\t\treturn func(*args)\n\t\texcept OSError, e:\n\t\t\tif e.errno == errno.EINTR:\n\t\t\t\tcontinue\n\t\t\traise\n"
+  },
+  {
+    "id": 131,
+    "specification": "Expected count again after changes",
+    "code": "def test_processor():\n    tp = process_from_web(affinity_class_limit=10)\n    assert tp\n    assert tp.statements\n    num_stmts = len(tp.statements)\n    # This is the total number of statements about human genes\n    assert num_stmts == 1168706, num_stmts\n    assert all(len(s.evidence) >= 1 for s in tp.statements), \\\n        'Some statements lack any evidence'"
+  },
+  {
+    "id": 132,
+    "specification": "Move object creation outside of get method",
+    "code": "class ApiBase(object):\n    def __init__(self, api_key, product, version='v1', entity=None):\n        self.product = product\n        self.version = version\n        self.entity = entity\n\n        self.api_url = 'https://api.laposte.fr/%(product)s/%(version)s/' % {\n                'product': self.product,\n                'version': self.version}\n\n        self.headers = {'X-Okapi-Key': api_key}\n\n    def get(self, resource, params={}):\n        response = self._get(resource, params)\n        if self.entity is None:\n            return response\n\n        return self.create_object(response, self.entity)\n\n    def _get(self, resource, params={}):\n        r = requests.get(self.api_url + resource, params=params, headers=self.headers)\n        return r.json()\n\n    def create_object(self, response, entity):\n        module = import_module('lapostesdk.entities')\n        obj = getattr(module, self.entity)\n        instance = obj()\n        instance.hydrate(response)\n        return instance"
+  },
+  {
+    "id": 134,
+    "specification": "Use score as well in annotations table",
+    "code": "def main(args):\n    rpkm_table =pd.read_table(args.rpkm_table, index_col=0)\n    annotations = pd.read_table(args.annotation_table, header=None, names=[\"gene_id\", \"annotation\", \"evalue\", \"score\"])\n\n    annotation_rpkm = {}\n    for annotation, annotation_df in annotations.groupby('annotation'):\n        annotation_rpkm[annotation] = rpkm_table.ix[annotation_df.gene_id].sum()\n\n    annotation_rpkm_df = pd.DataFrame.from_dict(annotation_rpkm, orient='index')\n    # sort the columns of the dataframe\n    annotation_rpkm_df = annotation_rpkm_df.reindex(columns=sorted(rpkm_table.columns))\n    annotation_rpkm_df.to_csv(sys.stdout, sep='\\t')\n"
+  },
+  {
+    "id": 135,
+    "specification": "Code which blanks patch files",
+    "code": "def ApplyPatches(filein, fileout):\n        # Generate short name such as wrans/answers2003-03-31.html\n        (rest, name) = os.path.split(filein)\n        (rest, dir) = os.path.split(rest)\n        fileshort = os.path.join(dir, name)\n\n        # Look for a patch file from our collection (which is\n        # in the pyscraper/patches folder in Public Whip CVS)\n        patchfile = os.path.join(\"patches\", fileshort + \".patch\")\n        if not os.path.isfile(patchfile):\n                return False\n\n        while True:\n                # Apply the patch\n                shutil.copyfile(filein, fileout)\n\n                # delete temporary file that might have been created by a previous patch failure \n                filoutorg = fileout + \".orig\"\n                if os.path.isfile(filoutorg):\n                    os.remove(filoutorg)\n                status = os.system(\"patch --quiet %s <%s\" % (fileout, patchfile))\n\n                if status == 0:\n                        return True\n\n                raise Exception, \"Error running 'patch' on file %s\" % fileshort\n\n                #print \"blanking out %s\" % fileshort\n                #os.rename(patchfile, patchfile + \".old~\")\n                #blankfile = open(patchfile, \"w\")\n                #blankfile.close()"
+  },
+  {
+    "id": 139,
+    "specification": "Allow the ingester to work without a report key",
+    "code": "class SNSReporter(object):\n    '''report ingestion events to SNS'''\n\n    def __init__(self, report_key):\n        self.report_key = report_key\n        self.logger = logging.getLogger(self._log_name)\n\n    @classmethod\n    def from_config(cls):\n        report_key = os.environ.get('DATALAKE_REPORT_KEY')\n        if report_key is None:\n            return None\n        return cls(report_key)\n\n    @property\n    def _log_name(self):\n        return self.report_key.split(':')[-1]\n\n    @memoized_property\n    def _connection(self):\n        region = os.environ.get('AWS_REGION')\n        if region:\n            return boto.sns.connect_to_region(region)\n        else:\n            return boto.connect_sns()\n\n    def report(self, ingestion_report):\n        message = json.dumps(ingestion_report)\n        self.logger.info('REPORTING: %s', message)\n        self._connection.publish(topic=self.report_key, message=message)"
+  },
+  {
+    "id": 140,
+    "specification": "Talk model __str__ to include time",
+    "code": "class Event(models.Model):\n    name = models.CharField(max_length=1024, unique=True)\n    slug = models.SlugField(max_length=1024)\n    \n    def __str__(self):\n        return self.name\n    "
+  },
+  {
+    "id": 141,
+    "specification": "Safety checks in test",
+    "code": "class CupyTestMemoryHook(cupy.cuda.memory_hook.MemoryHook):\n\n    name = 'CupyTestMemoryHook'\n\n    def __init__(self):\n        self.used_bytes = 0\n        self.acquired_bytes = 0\n\n    def alloc_preprocess(self, **kwargs):\n        self.acquired_bytes += kwargs['mem_size']\n\n    def malloc_preprocess(self, **kwargs):\n        self.used_bytes += kwargs['mem_size']\n\n"
+  },
+  {
+    "id": 143,
+    "specification": "Disable the extra check by default",
+    "code": "def launch(key_name=None, region='us-west-2', image_id='ami-5189a661',\n           instance_type='t2.micro', security_groups='launch-wizard-1',\n           user_data=None, initial_check=False):\n    '''\n    '''\n\n    if not isinstance(security_groups, list):\n        security_groups = [security_groups]\n\n    ec2 = boto.ec2.connect_to_region(region)\n\n    reserve = ec2.run_instances(image_id, key_name=key_name,\n                                instance_type=instance_type,\n                                security_groups=security_groups,\n                                user_data=user_data)\n\n    inst = reserve.instances[0]\n\n    while inst.state == u'pending':\n        time.sleep(10)\n        inst.update()\n\n    if initial_check:\n        # Wait for the status checks first\n        status = ec2.get_all_instance_status(instance_ids=[inst.id])[0]\n\n        check_stat = \"Status:initializing\"\n\n        while str(status.system_status) == check_stat and str(status.instance_status) == check_stat:\n            time.sleep(10)\n            status = ec2.get_all_instance_status(instance_ids=[inst.id])[0]\n\n    return inst\n\n    # ec2.get_instance_attribute('i-336b69f6', 'instanceType')"
+  },
+  {
+    "id": 144,
+    "specification": "Todo for future work",
+    "code": "def getAllMovies():\n  # TODO: determine all/unwatched/watched from settings...\n  # rpccmd = {'jsonrpc': '2.0', 'method': 'VideoLibrary.GetMovies', 'params': { 'filter': { 'field': 'playcount', 'operator': 'lessthan', 'value': '1' }, 'properties': [ 'file' ] }, 'id': 'libMovies'}\n  rpccmd = {'jsonrpc': '2.0', 'method': 'VideoLibrary.GetMovies', 'params': { 'properties': [ 'file' ] }, 'id': 'libMovies'}\n  rpccmd = json.dumps(rpccmd)\n  result = xbmc.executeJSONRPC(rpccmd)\n  result = json.loads(result)\n  return result\n"
+  },
+  {
+    "id": 145,
+    "specification": "Unused attributes; also, empty responses after it's flushed.",
+    "code": "class Message(object):\n    def __init__(self, backend, caller=None, text=None):\n        self._backend = backend\n        self.caller = caller\n        self.text = text\n        self.responses = []\n    \n    def __unicode__(self):\n        return self.text\n\n    @property\n    def backend(self):\n        # backend is read-only, since it's an\n        # immutable property of this object\n        return self._backend\n    \n    def send(self):\n        \"\"\"Send this message via self.backend, returning\n           True if the message was sent successfully.\"\"\"\n        return self.backend.router.outgoing(self)\n\n    def flush_responses (self):\n        for response in self.responses:\n            response.send()\n            self.responses.remove(response)\n\n    def respond(self, text):\n        \"\"\"Send the given text back to the original caller of this\n           message on the same route that it came in on\"\"\"\n        if self.caller: \n            response = copy.copy(self)\n            response.text = text\n            self.responses.append(response)\n            return True\n        else: \n            return False"
+  },
+  {
+    "id": 146,
+    "specification": "Input check when getting all nodes.",
+    "code": "class SwitchManager(object):\n    def extract_all_nodes(self, content):\n        \"\"\"\n        Return all nodes.\n        \"\"\"\n        if isinstance(content,dict) or not content.has_key('nodeProperties'):\n            return None\n        else:\n            return [e.get('node') for e in content['nodeProperties']]\n\n    def extract_all_properties(self, content):\n        pass"
+  },
+  {
+    "id": 147,
+    "specification": "Improve commenting on main function",
+    "code": "def get_arguments():\n    \"\"\"Set up the argument parser and return an object storing the\n    argument values.\n\n    return - An object storing argument values, as returned by\n    argparse.parse_args()\n\n    \"\"\"\n\n    parser = argparse.ArgumentParser(description=\"Compile C files.\")\n\n    # The file name of the C file to compile. The file name gets saved to the\n    # file_name attribute of the returned object, but this parameter appears as\n    # \"filename\" (no underscore) on the command line.\n    parser.add_argument(\"file_name\", metavar=\"filename\")\n    return parser.parse_args()\n"
+  },
+  {
+    "id": 148,
+    "specification": "Hardcoded shipping modification in order PDF view",
+    "code": "def product_xls(request):\n    output = StringIO.StringIO()\n    workbook = plata.reporting.product.product_xls()\n    workbook.save(output)\n    response = HttpResponse(output.getvalue(), mimetype='application/vnd.ms-excel')\n    response['Content-Disposition'] = 'attachment; filename=products.xls'\n    return response\n\n"
+  },
+  {
+    "id": 150,
+    "specification": "Copy postactivate file to VIRTUALENV directory.",
+    "code": "def with_venv(*args):\n    \"\"\"\n    Runs the given command inside virtualenv.\n    \"\"\"\n    cmd = list(args)\n    cmd.insert(0, WITH_VENV)\n    return subprocess.call(cmd)\n\n"
+  },
+  {
+    "id": 151,
+    "specification": "Check to convert() so that only integers are acceptable input",
+    "code": "class NumberToWords(object):\n    \"\"\"\n    Class for converting positive integer values to a textual representation\n    of the submitted number for value of 0 up to 999999999.\n    \"\"\"\n\n    MAX = 999999999\n    SMALL_NUMBERS = ['', 'one', 'two', 'three', 'four', 'five', 'six',\n                     'seven', 'eight', 'nine', 'ten', 'eleven',\n                     'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',\n                     'seventeen', 'eighteen', 'nineteen']\n    TENS = ['', '', 'twenty', 'thirty', 'fourty', 'fifty', 'sixty', 'seventy',\n            'eighty', 'ninety']\n    LARGE_NUMBERS = ['', 'thousand', 'million']\n    EXCEPTION_STRING = \"This method expects positive integer values between \" \\\n        + \"0 and {0}\".format(MAX)\n\n    def convert(self, number):\n        \"\"\"\n        Take an integer and return it converted to a textual representation.\n\n        Args:\n            number (int): The number to be converted.\n\n        Returns:\n            sentence (string): The textual representation of `number`.\n\n        Raises:\n            ValueError: If `number` is not a positive integer or is greater\n                        than `MAX`.\n        \"\"\"\n\n        if not isinstance(number, (int, long)):\n            raise ValueError(self.EXCEPTION_STRING)"
+  },
+  {
+    "id": 152,
+    "specification": "Error when trying to start without user/pass",
+    "code": "def main(username, password, debug):\n    navigator = Leifur(username, password)\n    if debug:\n        try:\n            navigator.start()\n        except Exception:\n            traceback.print_exc()\n            logger.error(traceback.format_exc())\n        finally:\n            navigator.shutdown()\n            logger.debug('Finally, bye!')\n    else:\n        try:\n            navigator.start()\n        finally:\n            navigator.shutdown()\n            logger.debug('Finally, bye!')\n\n"
+  },
+  {
+    "id": 153,
+    "specification": "Mark get new test as needing to be last",
+    "code": "def test_check_vers_update(fixture_update_dir):\n    package=fixture_update_dir(\"0.0.1\")\n    launch = Launcher('',r'http://rlee287.github.io/pyautoupdate/testing/')\n    launch._get_new()\n    with open(os.path.abspath(\"downloads/blah.py\"), \"r\") as file_code:\n        file_text=file_code.read()\n    assert \"new version\" in file_text"
+  },
+  {
+    "id": 154,
+    "specification": "Indentation error from conversion to spaces",
+    "code": "class QuantityWidget(MultiWidget):\n\n    def get_choices(self, allowed_types=None):\n        allowed_types = allowed_types or dir(ureg)\n        return [(x, x) for x in allowed_types]\n        \n    def __init__(self, attrs=None, base_units=None, allowed_types=None):\n        choices = self.get_choices(allowed_types)\n        self.base_units = base_units\n        attrs = attrs or {}\n        attrs.setdefault('step', 'any')\n\n        widgets = (\n                    NumberInput(attrs=attrs),\n                    Select(attrs=attrs, choices=choices)\n                )\n\n        super(QuantityWidget, self).__init__(widgets, attrs)\n\n    def decompress(self, value):\n        non_decimal = re.compile(r'[^\\d.]+')\n        if value:\n            number_value = non_decimal.sub('', str(value))\n            return [number_value, self.base_units]\n        return [None, self.base_units]"
+  },
+  {
+    "id": 155,
+    "specification": "Addition method to Terrain",
+    "code": "class Terrain(object):\n    \"\"\"Container for a randomly generated area of terrain.\n\n    Attributes:\n        width (int): Width of generated terrain.\n        length (int): Length of generated terrain.\n        height_map (list): Map of heights of terrain. Values range from 0 to 1.\n\n    \"\"\"\n\n    def __init__(self, width, length):\n        \"\"\"Initializer for Terrain.\n\n        Args:\n            width (int): Width of terrain.\n            length (int): Height of terrain.\n\n        \"\"\"\n        self.width = width\n        self.length = length\n        self.height_map = [[0 for _ in self.width]] * self.length\n\n    def __getitem__(self, item):\n        \"\"\"Get an item at x-y coordinates.\n\n        Args:\n            item (tuple): 2-tuple of x and y coordinates.\n\n        Returns:\n            float: Height of terrain at coordinates, between 0 and 1.\n\n        \"\"\"\n        return self.height_map[item[1]][item[0]]\n\n    def __setitem__(self, key, value):\n        \"\"\"Set the height of an item.\n\n        Args:\n            key (tuple): 2-tuple of x and y coordinates.\n            value (float): New height of map at x and y coordinates, between 0 and 1.\n\n        \"\"\"\n        self.height_map[key[1]][key[0]] = value\n\n    def __add__(self, other):\n        \"\"\"Add two terrains, height by height.\n\n        Args:\n            other (Terrain): Other terrain to add self to. Must have same dimensions as self.\n\n        Returns:\n            Terrain: Terrain of self and other added together.\n\n        \"\"\"\n        result = Terrain(self.width, self.length)\n        for i in range(self.width):\n            for j in range(self.length):\n                result[i, j] = self[i, j] + other[i, j]\n        return result"
+  },
+  {
+    "id": 157,
+    "specification": "Change 'username' destination to the 'username' attribute instead of user, since that's what is used in the code.",
+    "code": "def parent_parser():\n    \"\"\"Create command line argument parser with common PostgreSQL options\n\n    :return: the created parser\n    \"\"\"\n    parser = ArgumentParser(add_help=False)\n    parser.add_argument('dbname', help='database name')\n    group = parser.add_argument_group('Connection options')\n    group.add_argument('-H', '--host', help=\"database server host or \"\n                        \"socket directory (default %(default)s)\")\n    group.add_argument('-p', '--port', type=int, help=\"database server port \"\n                        \"number (default %(default)s)\")\n    group.add_argument('-U', '--username', dest='username',\n                        help=\"database user name (default %(default)s)\")\n    group.add_argument('-W', '--password', action=\"store_true\",\n                        help=\"force password prompt\")\n    parser.add_argument('-o', '--output', type=FileType('w'),\n                        help=\"output file name (default stdout)\")\n    parser.add_argument('--version', action='version', version='%(prog)s 0.4')\n    return parser"
+  },
+  {
+    "id": 158,
+    "specification": "Json filename to output.",
+    "code": "def get_json_file():\n    dir='/var/www/html'\n    json_list = []\n    for root, dirs, files in os.walk( dir ):\n        for f in files:\n            if f.endswith( '.json' ):\n\t        json_list.append( os.path.join( root, f ) )\n    sorted_list = sorted( json_list, key=os.path.getmtime )\n    return sorted_list[-1]\n\n"
+  },
+  {
+    "id": 161,
+    "specification": "Support to specify the valid external network name",
+    "code": "def get_ext_net_name(os_creds):\n    \"\"\"\n    Returns the configured external network name or\n    the first retrieved external network name\n    :param: os_creds: an instance of snaps OSCreds object\n    :return:\n    \"\"\"\n    neutron = neutron_utils.neutron_client(os_creds)\n    ext_nets = neutron_utils.get_external_networks(neutron)\n    if (hasattr(CONST, 'EXTERNAL_NETWORK')):\n        extnet_config = CONST.__getattribute__('EXTERNAL_NETWORK')\n        for ext_net in ext_nets:\n            if ext_net.name == extnet_config:\n                return extnet_config\n    return ext_nets[0].name if ext_nets else \"\"\n\n"
+  },
+  {
+    "id": 162,
+    "specification": "Test for connecting containment to package and a class [skip ci]\n\nSigned-off-by: Dan Yeaw <2591e5f46f28d303f9dc027d475a5c60d8dea17a@yeaw.me>",
+    "code": "def test_containment_package_glue(create):\n    \"\"\"Test containment glue to two package items.\"\"\"\n    pkg1 = create(PackageItem, UML.Package)\n    pkg2 = create(PackageItem, UML.Package)\n    containment = create(ContainmentItem)\n\n    glued = allow(containment, containment.head, pkg1)\n    assert glued\n\n    connect(containment, containment.head, pkg1)\n\n    glued = allow(containment, containment.tail, pkg2)\n    assert glued\n\n"
+  },
+  {
+    "id": 164,
+    "specification": "Missing methods to TPStats",
+    "code": "class TPStats(RemoteStats):\n\n    METRICS = (\n        (\"rss\", 1),    # already in bytes\n    )\n\n    def __init__(self, hosts, workers, user, password):\n        super().__init__(hosts, workers, user, password)\n        self.typeperf_cmd = \"typeperf \\\"\\\\Process(*{}*)\\\\Working Set\\\" -sc 1|sed '3q;d'\"\n\n    @parallel_task(server_side=True)\n    def get_server_samples(self, process):\n        samples = {}\n        if process == \"beam.smp\":\n            stdout = self.run(self.typeperf_cmd.format(\"erl\"))\n            values = stdout.split(',')[1:5]\n        elif process == \"memcached\":\n            stdout = self.run(self.typeperf_cmd.format(process))\n            values = stdout.split(',')[1:2]\n        else:\n            return samples\n        sum_rss = 0\n        if stdout:\n            for v in values:\n                v = float(v.replace('\"', ''))\n                sum_rss += v\n            metric, multiplier = self.METRICS[0]\n            title = \"{}_{}\".format(process, metric)\n            samples[title] = float(sum_rss) * multiplier\n            return samples\n\n    def get_client_samples(self, process):\n        pass"
+  },
+  {
+    "id": 165,
+    "specification": "Handling for multi-tenancy in sitemap.xml",
+    "code": "class DisplayableSitemap(Sitemap):\n    \"\"\"\n    Sitemap class for Django's sitemaps framework that returns\n    all published items for models that subclass ``Displayable``.\n    \"\"\"\n\n    def items(self):\n        \"\"\"\n        Return all published items for models that subclass\n        ``Displayable``, excluding those that point to external sites.\n        \"\"\"\n        # Fake homepage object.\n        home = Displayable()\n        setattr(home, \"get_absolute_url\", home_slug)\n        items = {home.get_absolute_url(): home}\n        for model in get_models():\n            if issubclass(model, Displayable):\n                for item in (model.objects.published()\n                             .exclude(slug__startswith=\"http://\")\n                             .exclude(slug__startswith=\"https://\")):\n                    items[item.get_absolute_url()] = item\n        return items.values()\n\n    def lastmod(self, obj):\n        if blog_installed and isinstance(obj, BlogPost):\n            return obj.publish_date\n\n    def get_urls(self, **kwargs):\n        \"\"\"\n        Ensure the correct host by injecting the current site.\n        \"\"\"\n        kwargs[\"site\"] = Site.objects.get(id=current_site_id())\n        return super(DisplayableSitemap, self).get_urls(**kwargs)"
+  },
+  {
+    "id": 166,
+    "specification": "Use the mint database for capsule data",
+    "code": "class CapsuleManager(manager.Manager):\n    def getIndexerConfig(self):\n        capsuleDataDir = util.joinPaths(self.cfg.dataPath, 'capsules')\n        cfg = rpath_capsule_indexer.IndexerConfig()\n        dbDriver = self.db.db.driver\n        dbConnectString = self.db.db.db.database\n        cfg.configLine(\"store %s:///%s\" % (dbDriver, dbConnectString))\n        cfg.configLine(\"indexDir %s/packages\" % capsuleDataDir)\n        cfg.configLine(\"systemsPath %s/systems\" % capsuleDataDir)\n        dataSources = self.db.platformMgr.listPlatformSources().platformSource\n        # XXX we only deal with RHN for now\n        if dataSources:\n            cfg.configLine(\"user RHN %s %s\" % (dataSources[0].username,\n                dataSources[0].password))\n        # XXX channels are hardcoded for now\n        cfg.configLine(\"channels rhel-i386-as-4\")\n        cfg.configLine(\"channels rhel-x86_64-as-4\")\n        cfg.configLine(\"channels rhel-i386-server-5\")\n        cfg.configLine(\"channels rhel-x86_64-server-5\")\n\n        util.mkdirChain(capsuleDataDir)\n        return cfg\n\n    def getIndexer(self):\n        cfg = self.getIndexerConfig()\n        return rpath_capsule_indexer.Indexer(cfg)"
+  },
+  {
+    "id": 167,
+    "specification": "That awful inventory migration issue",
+    "code": "class Migration(migrations.Migration):\n\n    dependencies = [\n        ('inventory', '0001_initial'),\n    ]\n\n    operations = [\n        migrations.AddField(\n            model_name='item',\n            name='column',\n            field=models.IntegerField(null=True),\n        ),\n        migrations.AddField(\n            model_name='item',\n            name='row',\n            field=models.IntegerField(null=True),\n        ),\n    ]"
+  },
+  {
+    "id": 169,
+    "specification": "Print out bag contents for lidar and button topics",
+    "code": "def print_bag(bag):\n    topics = ['/scan', '/flagbutton_pressed']\n    for message in bag.read_messages(topics=topics):\n        print(message)\n\n"
+  },
+  {
+    "id": 171,
+    "specification": "Sort line coverage info when reporting",
+    "code": "def get_coverage_with_js(self):\n    report = orig_get_coverage(self)\n\n    js_files = json.load(open('.coverage-js'))['files']\n    js_report = []\n\n    for f in js_files:\n        source = '\\n'.join(open(f['filename']).readlines())\n        name = os.path.relpath(f['filename'])\n        coverage = []\n\n        # Create sorted coverage array from original dict\n        for k, v in sorted(f['source'].items(), key=lambda x:int(x[0])):\n            coverage.append(v['coverage'] if v['coverage'] != '' else None)\n\n        js_report.append({\n            'source': source,\n            'name': name,\n            'coverage': coverage}\n        )\n\n    report += js_report\n    return report\n"
+  },
+  {
+    "id": 172,
+    "specification": "Implement function to load data from directory",
+    "code": "def load_data(dir_doc):\n\tdocs = {}\n\tfor dirpath, dirnames, filenames in os.walk(dir_doc):\n\t\tfor name in filenames:\n\t\t\tfile = os.path.join(dirpath, name)\n\t\t\twith io.open(file, 'r+') as f:\n\t\t\t\tdocs[name] = f.read()\n\n\treturn docs\n"
+  },
+  {
+    "id": 175,
+    "specification": "The PyPI version to 8.1.0.",
+    "code": "def read(fname):\n    try:\n        return open(os.path.join(os.path.dirname(__file__), fname)).read()\n    except:\n        return ''\n"
+  },
+  {
+    "id": 180,
+    "specification": "'bibpy.parsers' from package list",
+    "code": "def get_version(filename):\n    with open(filename) as fh:\n        for line in fh:\n            if line.startswith('__version__'):\n                return line.split('=')[-1].strip()[1:-1]\n\n"
+  },
+  {
+    "id": 188,
+    "specification": "Python 3 classifiers so users know this supports Python 3.",
+    "code": "def get_version():\n    \"\"\"\n    Get the version from version module without importing more than\n    necessary.\n    \"\"\"\n    version_module_path = os.path.join(os.path.dirname(__file__), \"eliot\",\n                                       \"_version.py\")\n\n    # The version module contains a variable called __version__\n    with open(version_module_path) as version_module:\n        exec(version_module.read())\n    return locals()[\"__version__\"]\n\n"
+  },
+  {
+    "id": 197,
+    "specification": "Set implicit loop for Python <3.6",
+    "code": "class Tasks:\n    loop = asyncio.new_event_loop()\n\n    @classmethod\n    def _run(cls):\n        asyncio.set_event_loop(cls.loop)\n\n        try:\n            cls.loop.run_forever()\n        finally:\n            cls.loop.close()\n\n    @classmethod\n    def do(cls, func, *args, **kwargs):\n        cls.loop.call_soon(lambda: func(*args, **kwargs))\n        cls.loop._write_to_self()\n\n    @classmethod\n    def later(cls, func, *args, after=None, **kwargs):\n        cls.loop.call_later(after, lambda: func(*args, **kwargs))\n        cls.loop._write_to_self()\n\n    @classmethod\n    def periodic(cls, func, *args, interval=None, **kwargs):\n        @asyncio.coroutine\n        def f():\n            while True:\n                yield from asyncio.sleep(interval)\n                func(*args, **kwargs)\n\n        cls.loop.create_task(f())\n        cls.loop._write_to_self()\n\n"
+  },
+  {
+    "id": 199,
+    "specification": "Handling of which on Windows",
+    "code": "def which(filename):\n    '''This takes a given filename; tries to find it in the environment path;\n    then checks if it is executable. This returns the full path to the filename\n    if found and executable. Otherwise this returns None.'''\n\n    # Special case where filename contains an explicit path.\n    if os.path.dirname(filename) != '' and is_executable_file(filename):\n        return filename\n    if 'PATH' not in os.environ or os.environ['PATH'] == '':\n        p = os.defpath\n    else:\n        p = os.environ['PATH']\n    pathlist = p.split(os.pathsep)\n    for path in pathlist:\n        ff = os.path.join(path, filename)\n        if pty:\n            if is_executable_file(ff):\n                return ff\n        else:\n            pathext = os.environ.get('Pathext', '.exe;.com;.bat;.cmd')\n            pathext = pathext.split(os.pathsep) + ['']\n            for ext in pathext:\n                if os.access(ff + ext, os.X_OK):\n                    return ff + ext\n    return None"
+  },
+  {
+    "id": 200,
+    "specification": "'provider location' as a searchable field for Images",
+    "code": "class ImageViewSet(MultipleFieldLookup, AuthOptionalViewSet):\n\n    \"\"\"\n    API endpoint that allows images to be viewed or edited.\n    \"\"\"\n    lookup_fields = (\"id\", \"uuid\")\n\n    http_method_names = ['get', 'put', 'patch', 'head', 'options', 'trace']\n\n    filter_fields = ('created_by__username', 'tags__name', 'projects__id')\n\n    permission_classes = (permissions.InMaintenance,\n                          permissions.ApiAuthOptional,\n                          permissions.CanEditOrReadOnly,\n                          permissions.ApplicationMemberOrReadOnly)\n\n    serializer_class = ImageSerializer\n\n    search_fields = ('id', 'name', 'versions__change_log', 'tags__name',\n                     'tags__description', 'created_by__username', 'versions__machines__instance_source__provider__location')\n\n    def get_queryset(self):\n        request_user = self.request.user\n        return Image.current_apps(request_user)"
+  },
+  {
+    "id": 203,
+    "specification": "Set latitude of Lake Superior",
+    "code": "class WindDrivenModel(ShallowWaterModel):\n    \"\"\"Class for wind driven model\n\n    Set flat initial conditions on Lake Superior\n    \"\"\"\n\n    def __init__(self):\n        self.nx = 151\n        self.ny = 151\n        self.Lbump = 0.0\n        self.Lx = 600e3\n        self.Ly = 600e3\n        self.lat = 43                   # Latitude of Lake Superior\n        super(WindDrivenModel, self).__init__()\n\n    def set_mask(self):\n        n = netcdf_file('superior_mask.grd', 'r')\n        z = n.variables['z']\n        self.msk = z.data\n\n"
+  },
+  {
+    "id": 204,
+    "specification": "Initialize final subclass of LanguageHandler",
+    "code": "class LanguageHandler(metaclass=abc.ABCMeta):\n    on_start = None  # type: Optional[Callable]\n    on_initialized = None  # type: Optional[Callable]\n\n    @abc.abstractproperty\n    def name(self) -> str:\n        raise NotImplementedError\n\n    @abc.abstractproperty\n    def config(self) -> ClientConfig:\n        raise NotImplementedError\n\n    @classmethod\n    def instantiate_all(cls) -> 'List[LanguageHandler]':\n        def get_final_subclasses(derived: 'List[Type[LanguageHandler]]',\n                                 results: 'List[Type[LanguageHandler]]') -> None:\n            for d in derived:\n                d_subclasses = d.__subclasses__()\n                if len(d_subclasses) > 0:\n                    get_final_subclasses(d_subclasses, results)\n                else:\n                    results.append(d)\n\n        subclasses = []  # type: List[Type[LanguageHandler]]\n        get_final_subclasses(cls.__subclasses__(), subclasses)\n        instantiated = []\n        for c in subclasses:\n            try:\n                instantiated.append(instantiate(c))\n            except Exception as e:\n                debug('LanguageHandler instantiation crashed!', e)\n        return instantiated\n\n"
+  },
+  {
+    "id": 206,
+    "specification": "Vx.expose so it works when a name is passed",
+    "code": "def _expose(f=None, name=None):\n    if name is None:\n        name = f.__name__.lstrip('_')\n    if getattr(vx, name, None) is not None:\n        raise AttributeError(\"Cannot expose duplicate name: '{}'\".format(name))\n    if f is None:\n        def g(f):\n            setattr(vx, name, f)\n            return f\n        return g\n    setattr(vx, name, f)\n    return f"
+  }
+]

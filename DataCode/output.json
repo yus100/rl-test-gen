@@ -1,0 +1,1480 @@
+[
+  {
+    "specification": "Declare queues when broker is instantiated",
+    "code": "class Broker(object):\n    def __init__(self, config):\n        self.connection = BrokerConnection(**config)\n        with producers[self.connection].acquire(block=False) as producer:\n            for queue in task_queues:\n                maybe_declare(queue, producer.channel)\n\n    def delay(self, func, *args, **kwargs):\n        payload = {\n            \"func\": func,\n            \"args\": args,\n            \"kwargs\": kwargs,\n        }\n\n        with producers[self.connection].acquire(block=False) as producer:\n            producer.publish(payload,\n                exchange=task_exchange,\n                serializer=\"pickle\",\n                compression=\"bzip2\",\n                queue='default',\n                routing_key='default',\n            )\n",
+    "perturbations": [
+      "def Broker(config): ...",
+      "def delay(self, func, *args, **kwargs): ...",
+      "def __init__(self, config): ...",
+      "def maybe_declare(queue, channel): ...",
+      "with producers[self.connection].acquire(block=False) as producer:"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "\"openweather unit tests\"",
+    "code": "def test_weather():\n    regex = u'Lappeenranta, FI: Temperature: \\d+.\\d\\xb0C, feels like: \\d+.\\d\\xb0C, wind: \\d+.\\d m/s, humidity: \\d+%, pressure: \\d+ hPa, cloudiness: \\d+%'\n    check_re(regex, module_openweather.command_weather(bot, None, \"#channel\", 'lappeenranta')[1])\n\n",
+    "perturbations": [
+      "def test_weather(): regex = u'Lappeenranta, FI: Temperature: -10.\\d\u00b0C, feels like: -20.\\d\u00b0C, wind: -30.\\d m/s, humidity: -40%, pressure: -50 hPa, cloudiness: -60%'",
+      "def test_weather(): regex = u'Lappeenranta, FI: Temperature: 10.\\d\u00b0C, feels like: 20.\\d\u00b0C, wind: 30.\\d m/s, humidity: 40%, pressure: 50 hPa, cloudiness: 60%'",
+      "def test_weather(): regex = u'Lappeenranta, FI: Temperature: 10.\\d\u00b0C, feels like: -20.\\d\u00b0C, wind: 30.\\d m/s, humidity: 40%, pressure: 50 hPa, cloudiness: 60%'",
+      "def test_weather(): regex = u'Lappeenranta, FI: Temperature: 10.\\d\u00b0C, feels like: 20.\\d\u00b0C, wind: -30.\\d m/s, humidity: 40%, pressure: 50 hPa, cloudiness: 60%'",
+      "def test_weather(): regex = u'Lappeenranta, FI: Temperature: 10.\\d\u00b0C, feels like: 20.\\d\u00b0C, wind: 30.\\d m/s, humidity: -40%, pressure: 50 hPa, cloudiness: 60%'"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "\"validation\" from RejectionException docstring",
+    "code": "class AutomatonException(Exception):\n    \"\"\"The base class for all automaton-related errors.\"\"\"\n\n    pass\n\n",
+    "perturbations": [
+      "def example(): raise AutomatonException('Invalid input')",
+      "def example(): if True: raise AutomatonException('Invalid input')",
+      "def example(): return 'Valid' if False else raise AutomatonException('Invalid input')",
+      "def example(): if 1 < 2: raise AutomatonException('Invalid input')",
+      "def example(): if None: raise AutomatonException('Invalid input')"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Implied_group, it still refers to the old module name",
+    "code": "class AccountConfigSettings(orm.TransientModel):\n    _inherit = 'account.config.settings'\n\n    _columns = {\n        'group_use_product_description_per_inv_line': fields.boolean(\n            \"\"\"Allow using only the product description on the\n            invoice order lines\"\"\",\n            implied_group=\"account_invoice_line_description.\"\n            \"group_use_product_description_per_inv_line\",\n            help=\"\"\"Allows you to use only product description on the\n            invoice order lines.\"\"\"\n        ),\n    }",
+    "perturbations": [
+      "def AccountConfigSettings(orm.TransientModel): _inherit = 'account.config.settings' _columns = { 'group_use_product_description_per_inv_line': fields.boolean('Allow using only the product description on the invoice order lines', implied_group='account_invoice_line_description.group_use_product_description_per_inv_line', help='Allows you to use only product description on the invoice order lines.') }",
+      "def AccountConfigSettings(orm.TransientModel): _inherit = 'account.config.settings' _columns = { 'group_use_product_description_per_inv_line': fields.boolean('Allow using only the product description on the invoice order lines', implied_group='account_invoice_line_description.group_use_product_description_per_inv_line_1234567890', help='Allows you to use only product description on the invoice order lines.') }",
+      "def AccountConfigSettings(orm.TransientModel): _inherit = 'account.config.settings' _columns = { 'group_use_product_description_per_inv_line': fields.boolean('Allow using only the product description on the invoice order lines', implied_group='account_invoice_line_description.group_use_product_description_per_inv_line', help='Allows you to use only product description on the invoice order lines. 1234567890') }",
+      "def AccountConfigSettings(orm.TransientModel): _inherit = 'account.config.settings' _columns = { 'group_use_product_description_per_inv_line': fields.boolean('Allow using only the product description on the invoice order lines', implied_group='account_invoice_line_description.group_use_product_description_per_inv_line', help=None) }",
+      "def AccountConfigSettings(orm.TransientModel): _inherit = 'account.config.settings' _columns = { 'group_use_product_description_per_inv_line': fields.boolean('Allow using only the product description on the invoice order lines', implied_group='account_invoice_line_description.group_use_product_description_per_inv_line', help=True) }"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Interpretation of parameters for names list modification",
+    "code": "class InvisibleMode(Mode):\n\tdef namesListEntry(self, recipient, channel, user, representation):\n\t\tif channel.name not in recipient.channels and \"i\" in user.mode:\n\t\t\treturn \"\"\n\t\treturn representation\n",
+    "perturbations": [
+      "def example(self, recipient, channel, user, representation):\n    return 'Hello'",
+      "def example(self, recipient, channel, user, representation):\n    return recipient.name",
+      "def example(self, recipient, channel, user, representation):\n    if channel.name not in recipient.channels and \"i\" in user.mode:\n        return None",
+      "def example(self, recipient, channel, user, representation):\n    return user.mode['i']",
+      "def example(self, recipient, channel, user, representation):\n    return user.name + ' ' + channel.name"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Correct the description and the dev status to stable.",
+    "code": "def read(filename):\n  with open(filename) as fin:\n    return fin.read()\n",
+    "perturbations": [
+      "def read(filename): return fin.read() + 'extra text'",
+      "def read(filename): with open(filename) as fin: return fin.read(10)",
+      "def read(filename): with open(filename) as fin: return fin.readlines()[2]",
+      "def read(filename): with open(filename) as fin: return int(fin.read())",
+      "def read(filename): with open(filename) as fin: return 'Hello, world!'"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Allow mutiple hooks for packets",
+    "code": "class packetHook(object):\n\tdef __init__(self, pktType, pktSubtype):\n\t\tself.pktType = pktType\n\t\tself.pktSubtype = pktSubtype\n\n\tdef __call__(self, f):\n\t\tglobal packetFunctions\n\t\tif (self.pktType, self.pktSubtype) not in packetFunctions:\n\t\t\tpacketFunctions[(self.pktType, self.pktSubtype)] = []\n\t\tpacketFunctions[(self.pktType, self.pktSubtype)].append(f)\n",
+    "perturbations": [
+      "def packetHook(pktType, pktSubtype):\n\tglobal packetFunctions\n\tpacketFunctions = {('a', 'b'): [lambda x: None], ('c', 'd'): []}\n\n",
+      "def packetHook(pktType, pktSubtype):\n\tglobal packetFunctions\n\tpacketFunctions = {'a': {1: lambda x: None}}\n\n",
+      "def packetHook(pktType, pktSubtype):\n\tglobal packetFunctions\n\tpacketFunctions = {1: [lambda x: None]}\n\n",
+      "def packetHook(pktType, pktSubtype):\n\tglobal packetFunctions\n\tpacketFunctions = {(1, 'a'): [lambda x: None]}\n\n",
+      "def packetHook(pktType, pktSubtype):\n\tglobal packetFunctions\n\tpacketFunctions = {('a', 1): []}\n"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Allow for use in daily.py",
+    "code": "def _genAll(d=None,quiet=''):\n\tif not d: d = '.'\n\tif not os.path.isabs(d):\n\t\td = os.path.normpath(os.path.join(os.getcwd(),d))\n\tfor p in ('reference/genreference.py',\n\t\t\t  'userguide/genuserguide.py',\n\t\t\t  'graphguide/gengraphguide.py',\n\t\t\t  '../tools/docco/graphdocpy.py'):\n\t\tos.chdir(d)\n\t\tos.chdir(os.path.dirname(p))\n\t\tos.system('%s %s %s' % (sys.executable,os.path.basename(p), quiet))\n",
+    "perturbations": [
+      "def _genAll(d=None,quiet=''):\n    if not d: d = '.\n    if not os.path.isabs(d):\n        d = os.path.normpath(os.path.join(os.getcwd(),d))\n    for p in ('reference/genreference.py',\n              'userguide/genuserguide.py',\n              'graphguide/gengraphguide.py',\n              '../tools/docco/graphdocpy.py'):\n        os.chdir(d)\n        os.chdir(os.path.dirname(p))\n        os.system('%s %s %s' % (sys.executable,os.path.basename(p), quiet+1))",
+      "def _genAll(d=None,quiet=''):\n    if not d: d = '.\n    if not os.path.isabs(d):\n        d = os.path.normpath(os.path.join(os.getcwd(),d))\n    for p in ('reference/genreference.py',\n              'userguide/genuserguide.py',\n              'graphguide/gengraphguide.py',\n              '../tools/docco/graphdocpy.py'):\n        os.chdir(d)\n        os.chdir(os.path.dirname(p))\n        os.system('%s %s %s' % (sys.executable,os.path.basename(p), quiet-1))",
+      "def _genAll(d=None,quiet=''):\n    if not d: d = '.\n    if not os.path.isabs(d):\n        d = os.path.normpath(os.path.join(os.getcwd(),d))\n    for p in ('reference/genreference.py',\n              'userguide/genuserguide.py',\n              'graphguide/gengraphguide.py',\n              '../tools/docco/graphdocpy.py'):\n        os.chdir(d)\n        os.chdir(os.path.dirname(p))\n        os.system('%s %s %s' % (sys.executable,os.path.basename(p), quiet*2))",
+      "def _genAll(d=None,quiet=''):\n    if not d: d = '.\n    if not os.path.isabs(d):\n        d = os.path.normpath(os.path.join(os.getcwd(),d))\n    for p in ('reference/genreference.py',\n              'userguide/genuserguide.py',\n              'graphguide/gengraphguide.py',\n              '../tools/docco/graphdocpy.py'):\n        os.chdir(d)\n        os.chdir(os.path.dirname(p))\n        os.system('%s %s %s' % (sys.executable,os.path.basename(p), quiet/2))",
+      "def _genAll(d=None,quiet=''):\n    if not d: d = '.\n    if not os.path.isabs(d):\n        d = os.path.normpath(os.path.join(os.getcwd(),d))\n    for p in ('reference/genreference.py',\n              'userguide/genuserguide.py',\n              'graphguide/gengraphguide.py',\n              '../tools/docco/graphdocpy.py'):\n        os.chdir(d)\n        os.chdir(os.path.dirname(p))\n        os.system('%s %s %s' % (sys.executable,os.path.basename(p), quiet**2))"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Install the proper version of Django",
+    "code": "def convert_readme():\n    try:\n        check_call([\"pandoc\", \"-f\", \"markdown_github\", \"-t\",\n                    \"rst\", \"-o\", \"README.rst\", \"README.md\"])\n    except (OSError, CalledProcessError):\n        return open('README.md').read()\n\n    return open('README.rst').read()\n\n",
+    "perturbations": [
+      "def convert_readme(): try: check_call([\"pandoc\", \"-f\", \"markdown_github\", \"-t\", \"rst\", \"-o\", \"README.rst\", \"README.md\"]) except (OSError, CalledProcessError): return open('README.md').read() else: return open('README.rst').read()",
+      "def convert_readme(): try: check_call([\"pandoc\", \"-f\", \"markdown_github\", \"-t\", \"rst\", \"-o\", \"README.rst\", \"README.md\"]) except (OSError, CalledProcessError): return open('README.rst').read() else: print(\"Conversion failed\")",
+      "def convert_readme(): try: check_call([\"pandoc\", \"-f\", \"markdown_github\", \"-t\", \"rst\", \"-o\", \"README.rst\", \"README.md\"]) except (OSError, CalledProcessError): return open('README.rst').read() else: print(\"Conversion successful\")",
+      "def convert_readme(): try: check_call([\"pandoc\", \"-f\", \"markdown_github\", \"-t\", \"rst\", \"-o\", \"README.rst\", \"README.md\"]) except (OSError, CalledProcessError): return open('README.md').read() else: print(\"Conversion complete\")",
+      "def convert_readme(): try: check_call([\"pandoc\", \"-f\", \"markdown_github\", \"-t\", \"rst\", \"-o\", \"README.rst\", \"README.md\"]) except (OSError, CalledProcessError): return open('README.md').read() else: print(\"Conversion finished\")"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Pykqml dependency lower limit",
+    "code": "def main():\n    setup(name='bioagents',\n          version='0.0.1',\n          description='Biological Reasoning Agents',\n          long_description='Biological Reasoning Agents',\n          author='Benjamin Gyori',\n          author_email='benjamin_gyori@hms.harvard.edu',\n          url='http://github.com/sorgerlab/bioagents',\n          packages=find_packages(),\n          install_requires=['indra', 'pykqml>=1.2'],\n          include_package_data=True,\n          keywords=['systems', 'biology', 'model', 'pathway', 'assembler',\n                    'nlp', 'mechanism', 'biochemistry'],\n          classifiers=[\n            'Development Status :: 4 - Beta',\n            'Environment :: Console',\n            'Intended Audience :: Science/Research',\n            'License :: OSI Approved :: BSD License',\n            'Operating System :: OS Independent',\n            'Programming Language :: Python :: 3',\n            'Topic :: Scientific/Engineering :: Bio-Informatics',\n            'Topic :: Scientific/Engineering :: Chemistry',\n            'Topic :: Scientific/Engineering :: Mathematics',\n            ],\n          )\n\n",
+    "perturbations": [
+      "def main():\n    setup(name='bioagents',\n          version='0.0.1',\n          description='Biological Reasoning Agents',\n          long_description='Biological Reasoning Agents',\n          author='Benjamin Gyori',\n          author_email='benjamin_gyori@hms.harvard.edu',\n          url='http://github.com/sorgerlab/bioagents',\n          packages=find_packages(),\n          install_requires=['indra', 'pykqml>=1'],\n          include_package_data=True,\n          keywords=['systems', 'biology', 'model', 'pathway', 'assembler',\n                    'nlp', 'mechanism', 'biochemistry'],\n          classifiers=[\n            'Development Status :: 4 - Beta',\n            'Environment :: Console',\n            'Intended Audience :: Science/Research',\n            'License :: OSI Approved :: BSD License',\n            'Operating System :: OS Independent',\n            'Programming Language :: Python :: 3',\n            'Topic :: Scientific/Engineering :: Bio-Informatics',\n            'Topic :: Scientific/Engineering :: Chemistry',\n            'Topic :: Scientific/Engineering :: Mathematics',\n            ],\n          )",
+      "def main():\n    setup(name='bioagents',\n          version='0.0.1',\n          description='Biological Reasoning Agents',\n          long_description='Biological Reasoning Agents',\n          author='Benjamin Gyori',\n          author_email='benjamin_gyori@hms.harvard.edu',\n          url='http://github.com/sorgerlab/bioagents',\n          packages=find_packages(),\n          install_requires=['indra', 'pykqml>1'],\n          include_package_data=True,\n          keywords=['systems', 'biology', 'model', 'pathway', 'assembler',\n                    'nlp', 'mechanism', 'biochemistry'],\n          classifiers=[\n            'Development Status :: 4 - Beta',\n            'Environment :: Console',\n            'Intended Audience :: Science/Research',\n            'License :: OSI Approved :: BSD License',\n            'Operating System :: OS Independent',\n            'Programming Language :: Python :: 3',\n            'Topic :: Scientific/Engineering :: Bio-Informatics',\n            'Topic :: Scientific/Engineering :: Chemistry',\n            'Topic :: Scientific/Engineering :: Mathematics',\n            ],\n          )",
+      "def main():\n    setup(name='bioagents',\n          version='0.0.1',\n          description='Biological Reasoning Agents',\n          long_description='Biological Reasoning Agents',\n          author='Benjamin Gyori',\n          author_email='benjamin_gyori@hms.harvard.edu',\n          url='http://github.com/sorgerlab/bioagents',\n          packages=find_packages(),\n          install_requires=['indra', 'pykqml>=1.2'],\n          include_package_data=True,\n          keywords=['systems', 'biology', 'model', 'pathway', 'assembler',\n                    'nlp', 'mechanism', 'biochemistry'],\n          classifiers=[\n            'Development Status :: 4 - Beta',\n            'Environment :: Console',\n            'Intended Audience :: Science/Research',\n            'License :: OSI Approved :: BSD License',\n            'Operating System :: OS Independent',\n            'Programming Language :: Python :: 3',\n            'Topic :: Scientific/Engineering :: Bio-Informatics',\n            'Topic :: Scientific/Engineering :: Chemistry',\n            'Topic :: Scientific/Engineering :: Mathematics',\n            ],\n          )",
+      "def main():\n    setup(name='bioagents',\n          version='0.0.1',\n          description='Biological Reasoning Agents',\n          long_description='Biological Reasoning Agents',\n          author='Benjamin Gyori',\n          author_email='benjamin_gyori@hms.harvard.edu',\n          url='http://github.com/sorgerlab/bioagents',\n          packages=find_packages(),\n          install_requires=['indra', 'pykqml>=1.2'],\n          include_package_data=True,\n          keywords=['systems', 'biology', 'model', 'pathway', 'assembler',\n                    'nlp', 'mechanism', 'biochemistry'],\n          classifiers=[\n            'Development Status :: 4 - Beta',\n            'Environment :: Console',\n            'Intended Audience :: Science/Research',\n            'License :: OSI Approved :: BSD License',\n            'Operating System :: OS Independent',\n            'Programming Language :: Python :: 3',\n            'Topic :: Scientific/Engineering :: Bio-Informatics',\n            'Topic :: Scientific/Engineering :: Chemistry',\n            'Topic :: Scientific/Engineering :: Mathematics',\n            ],\n          )",
+      "def main():\n    setup(name='bioagents',\n          version='0.0.1',\n          description='Biological Reasoning Agents',\n          long_description='Biological Reasoning Agents',\n          author='Benjamin Gyori',\n          author_email='benjamin_gyori@hms.harvard.edu',\n          url='http://github.com/sorgerlab/bioagents',\n          packages=find_packages(),\n          install_requires=['indra', 'pykqml>=1.2'],\n          include_package_data=True,\n          keywords=['systems', 'biology', 'model', 'pathway', 'assembler',\n                    'nlp', 'mechanism', 'biochemistry'],\n          classifiers=[\n            'Development Status :: 4 - Beta',\n            'Environment :: Console',\n            'Intended Audience :: Science/Research',\n            'License :: OSI Approved :: BSD License',\n            'Operating System :: OS Independent',\n            'Programming Language :: Python :: 3',\n            'Topic :: Scientific/Engineering :: Bio-Informatics',\n            'Topic :: Scientific/Engineering :: Chemistry',\n            'Topic :: Scientific/Engineering :: Mathematics',\n            ],\n          )"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Install static files with distutils.",
+    "code": "def find_data_files(filepath):\n    return sum([\n        [(path, [os.path.join(path, name)]) for name in names]\n            for path, _, names in os.walk(filepath)], [])\n",
+    "perturbations": [
+      "def find_data_files(filepath): return sum([[path, [os.path.join(path, name)]] for path, _, names in os.walk(filepath) if filepath is None], [])",
+      "def find_data_files(filepath): return sum([[path, [os.path.join(path, name)]] for path, _, names in os.walk(filepath) if len(names) == 0], [])",
+      "def find_data_files(filepath): return sum([[path, [os.path.join(path, name)]] for path, _, names in os.walk(filepath) if not isinstance(filepath, str)], [])",
+      "def find_data_files(filepath): return sum([[path, [os.path.join(path, name)]] for path, _, names in os.walk(filepath) if len(names) > 10], [])",
+      "def find_data_files(filepath): return sum([[path, [os.path.join(path, name)]] for path, _, names in os.walk(filepath) if not os.path.exists(filepath)], [])"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Use PEP 508 version markers.",
+    "code": "def extras_require():\n    return {\n        'test': [\n            'tox>=2.0',\n            'pytest>=2.8.5',\n            'pytest-cov>=1.8.1',\n            'pytest-pep8>=1.0.6',\n        ],\n    }\n\n",
+    "perturbations": [
+      "def extras_require(): return { 'test': ['tox>=2.0', 'pytest<2.8.5', 'pytest-cov>=1.8.1', 'pytest-pep8>=1.0.6'] }",
+      "def extras_require(): return { 'test': ['tox>=2.0', 'pytest<=2.8.5', 'pytest-cov>=1.8.1', 'pytest-pep8>=1.0.6'] }",
+      "def extras_require(): return { 'test': ['tox>=2.0', 'pytest==2.8.5', 'pytest-cov>=1.8.1', 'pytest-pep8>=1.0.6'] }",
+      "def extras_require(): return { 'test': ['tox>=2.0', 'pytest>=2.8.5', 'pytest-cov<1.8.1', 'pytest-pep8>=1.0.6'] }",
+      "def extras_require(): return { 'test': ['tox>=2.0', 'pytest>=2.8.5', 'pytest-cov>=1.8.1', 'pytest-pep8<=1.0.6'] }"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Standard Ansible exception handling",
+    "code": "def split_string(string, seperator=' '):\n    try:\n        return string.split(seperator)\n    except Exception, e:\n        raise errors.AnsibleFilterError('split plugin error: %s, string=%s' % str(e),str(string) )\n",
+    "perturbations": [
+      "def split_string(string, seperator=' '): return string.split(seperator)",
+      "def split_string(string, seperator=' '): raise errors.AnsibleFilterError('split plugin error: %s',str(string) )",
+      "def split_string(string, seperator=' '): return string.join(seperator)",
+      "def split_string(string, seperator=' '): raise errors.AnsibleFilterError('split plugin error: %s, string=%s' % (e,e), str(string))",
+      "def split_string(string, seperator=' '): raise errors.AnsibleFilterError('split plugin error: %s, string=%s' % e, str(string))"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Modify created_at and updated_at to millisecond",
+    "code": "def valid(qs):\n    required_keys = ['title', 'comment', 'posted_by', 'localite', 'latitude', 'longitude']\n    return all([qs.has_key(k) for k in required_keys])\n",
+    "perturbations": [
+      "def valid(qs): return qs['title'] == 'example'",
+      "def valid(qs): return qs['comment'] <= 'example'",
+      "def valid(qs): return qs['posted_by'] < 'example'",
+      "def valid(qs): return qs['localite'] >= 'example'",
+      "def valid(qs): return qs['latitude'] > 'example'"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Print result to use \",\" instead of \"+\" for context text",
+    "code": "def calculate_sum(data_sample):\n\ttotal = 0\n\tfor row in data_sample[1:]: # slice to start at row two, but I think we should only skip row 1 if we're importing the full csv (data_from_csv), but if we use the data w/ the header (my_csv) we'll be skipping a row that we're not supposed to skip (the actual first row of non-header data). \n\t\tprice = float(row[2])\n\t\ttotal += price\n\treturn total\n",
+    "perturbations": [
+      "def calculate_sum(data_sample): total = 0; for row in data_sample[1:]: price = float(row[2]); total -= price; return total;",
+      "def calculate_sum(data_sample): total = 0; for row in data_sample[1:]: price = int(row[2]); total += price; return total;",
+      "def calculate_sum(data_sample): total = 0; for row in data_sample[1:]: price = float(row[2]); total += int(price); return total;",
+      "def calculate_sum(data_sample): total = 0; for row in data_sample[1:]: price = float(row[2]); total *= price; return total;",
+      "def calculate_sum(data_sample): total = 0; for row in data_sample[1:]: price = float(row[2]); total /= price; return total;"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Test if default rotor encodes forward properly",
+    "code": "class RotorTestCase(unittest.TestCase):\n    def test_rotor_encoding(self):\n        rotor = Walzen(wiring='EKMFLGDQVZNTOWYHXUSPAIBRCJ', notch='Q')\n        self.assertEqual('E', rotor.encode('A'))\n\n",
+    "perturbations": [
+      "def rotor_encoding(self): self.assertEqual('B', rotor.encode('A'))",
+      "def rotor_encoding(self): self.assertEqual('', rotor.encode('A'))",
+      "def rotor_encoding(self): self.assertEqual('E', rotor.encode(97))",
+      "def rotor_encoding(self): self.assertEqual('E', rotor.encode('a'))",
+      "def rotor_encoding(self): self.assertEqual('A', rotor.encode('B'))"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Nologin in expected user shell test",
+    "code": "def test_installed_packages(host, name):\n    \"\"\"\n    Test if packages installed\n    \"\"\"\n\n    assert host.package(name).is_installed\n\n",
+    "perturbations": [
+      "def test_installed_packages(host, name):\n    assert host.package(name).is_installed == True",
+      "def test_installed_packages(host, name):\n    assert host.package(name).installed == False",
+      "def test_installed_packages(host, name):\n    assert host.package(name).is_available() == True",
+      "def test_installed_packages(host, name):\n    assert host.package(name).available == False",
+      "def test_installed_packages(host, name):\n    assert host.package(name).exists() == False"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Some paths where to find test binary",
+    "code": "class TestBase(unittest.TestCase):\n    def get_test_binary(self):\n        \"\"\"Helper to obtain a test binary for object file testing.\n\n        FIXME Support additional, highly-likely targets or create one\n        ourselves.\n        \"\"\"\n        for d in POSSIBLE_TEST_BINARY_PATHS:\n            for lib in POSSIBLE_TEST_BINARIES:\n                path = os.path.join(d, lib)\n\n                if os.path.exists(path):\n                    return path\n\n        raise Exception('No suitable test binaries available!')\n    get_test_binary.__test__ = False",
+    "perturbations": [
+      "def get_test_binary(self): return os.path.join('wrong_directory', 'test_binary')",
+      "def get_test_binary(self): for d in POSSIBLE_TEST_BINARY_PATHS: return d",
+      "def get_test_binary(self): raise Exception('No suitable test binaries available!') or path",
+      "def get_test_binary(self): if not os.path.exists(path): return False",
+      "def get_test_binary(self): if not os.path.exists(path): return"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Change task to create a taskHistory object",
+    "code": "def set_celery_healthcheck_last_update(self):\n    try:\n        task_history = TaskHistory.register(request=self.request, user=None)\n\n        LOG.info(\"Setting Celery healthcheck last update\")\n        CeleryHealthCheck.set_last_update()\n\n        task_history.update_status_for(TaskHistory.STATUS_SUCCESS, details=\"Finished\")\n    except Exception, e:\n        LOG.warn(\"Oopss...{}\".format(e))\n        task_history.update_status_for(TaskHistory.STATUS_ERROR, details=e)\n    finally:\n        return",
+    "perturbations": [
+      "def set_celery_healthcheck_last_update(self): raise ValueError('Invalid input')",
+      "def set_celery_healthcheck_last_update(self): return 'Error'",
+      "def set_celery_healthcheck_last_update(self): LOG.info('Setting Celery healthcheck last update'); CeleryHealthCheck.set_last_update(); task_history.update_status_for(TaskHistory.STATUS_ERROR, details='Invalid')",
+      "def set_celery_healthcheck_last_update(self): try: raise Exception('Test exception') except ValueError as e: LOG.warn(\"Oopss...{}\").format(e)",
+      "def set_celery_healthcheck_last_update(self): return {'result': 'success'}"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Error Message To Server",
+    "code": "def get_author(title):\n    host = 'https://www.googleapis.com/books/v1/volumes?q={}&key={}&country=US'.format(title, key)\n    request = urllib2.Request(host)\n    try:\n        response = urllib2.urlopen(request)\n    except urllib2.HTTPError, error:\n        contents = error.read()\n        print ('Received error from Books API {}'.format(contents))\n        return str(contents)\n    html = response.read()\n    author = json.loads(html)['items'][0]['volumeInfo']['authors'][0]\n    return author\n",
+    "perturbations": [
+      "def get_author(title):\n    host = 'https://www.googleapis.com/books/v1/volumes?q={}&key={}&country=US'.format(title)\n    request = urllib2.Request(host)\n    try:\n        response = urllib2.urlopen(request)\n    except urllib2.HTTPError, error:\n        contents = error.read()\n        print ('Received error from Books API {}' format(contents))\n        return [contents]\n    html = response.read()\n    author = json.loads(html)['items'][0]['volumeInfo']['authors'][1]\n    return author",
+      "def get_author(title):\n    host = 'https://www.googleapis.com/books/v1/volumes?q={}&key={}&country=US'.format(title)\n    request = urllib2.Request(host)\n    try:\n        response = urllib2.urlopen(request)\n    except urllib2.HTTPError, error:\n        contents = error.read()\n        print ('Received error from Books API {}' format(contents))\n        return [error]\n    html = response.read()\n    author = json.loads(html)['items'][0]['volumeInfo']['authors'][1]\n    return author",
+      "def get_author(title):\n    host = 'https://www.googleapis.com/books/v1/volumes?q={}&key={}&country=US'.format(title)\n    request = urllib2.Request(host)\n    try:\n        response = urllib2.urlopen(request)\n    except urllib2.HTTPError, error:\n        contents = error.read()\n        print ('Received error from Books API {}' format(contents))\n        return [contents.encode('utf-8')]\n    html = response.read()\n    author = json.loads(html)['items'][0]['volumeInfo']['authors'][1]\n    return author",
+      "def get_author(title):\n    host = 'https://www.googleapis.com/books/v1/volumes?q={}&key={}&country=US'.format(title)\n    request = urllib2.Request(host)\n    try:\n        response = urllib2.urlopen(request)\n    except urllib2.HTTPError, error:\n        contents = error.read()\n        print ('Received error from Books API {}' format(contents))\n        return [contents.decode('utf-8')]\n    html = response.read()\n    author = json.loads(html)['items'][0]['volumeInfo']['authors'][1].encode('utf-8').decode('utf-8')\n    return author",
+      "def get_author(title):\n    host = 'https://www.googleapis.com/books/v1/volumes?q={}&key={}&country=US'.format(title)\n    request = urllib2.Request(host)\n    try:\n        response = urllib2.urlopen(request)\n    except urllib2.HTTPError, error:\n        contents = error.read()\n        print ('Received error from Books API {}' format(contents))\n        return [contents.encode('utf-8').decode('ascii')]\n    html = response.read()\n    author = json.loads(html)['items'][0]['volumeInfo']['authors'][1].encode('utf-8').decode('ascii')\n    return author"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Error in loading trees",
+    "code": "class TreeIndex:\n\n\tdef __init__(self,tree_newick_fn,format=DEFAULT_FORMAT):\n\t\tself.tree_newick_fn=tree_newick_fn\n\t\tself.tree=Tree(tree_newick_fn,format=format)\n\n\tdef process_node(self,node):\n\t\tif node.is_leaf():\n\t\t\tif hasattr(node,\"fastapath\"):\n\t\t\t\tfastas_fn=node.fastapath.split(\"@\")\n\t\t\t\tfor fasta_fn in fastas_fn:\n\t\t\t\t\tprint(fasta_fn)\n\n\t\telse:\n\t\t\tchildren=node.get_children()\n\n\t\t\tfor child in children:\n\t\t\t\tself.process_node(child)\n\n\n",
+    "perturbations": [
+      "def TreeIndex(self): self.tree = None",
+      "def process_node(self,node): pass",
+      "def __init__(self,tree_newick_fn,format=DEFAULT_FORMAT): self.tree = 'invalid'",
+      "def process_node(self,node): print('leaf')",
+      "def process_node(self,node): for child in range(len(node.get_children())):"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Getdoctarget to ignore comment lines",
+    "code": "def get_version_string():\n    fn = py.path.local(__file__).join(\"..\", \"..\", \"..\",\n                                      \"_pytest\", \"__init__.py\")\n    for line in fn.readlines():\n        if \"version\" in line and not line.strip().startswith('#'):\n            return eval(line.split(\"=\")[-1])\n",
+    "perturbations": [
+      "def get_version_string(): return '1.0'",
+      "def get_version_string(): return None if not fn.exists() else eval(line.split('=')[-1])",
+      "def get_version_string(): return ''",
+      "def get_version_string(): for line in fn.readlines()[::-1]: ...",
+      "def get_version_string(): for line in fn.readlines(): ..."
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Bug with 'all' argument",
+    "code": "def generate_asset(resource, out_storage: ExplanationStorage):\n    out_storage.clear()\n    for explanation in resource:\n        r = copy(explanation)\n        for functor in resource.modifiers:\n            if r is None:\n                break\n            r = functor(r)\n        if r is not None:\n            out_storage.add_entry(r)\n\n",
+    "perturbations": [
+      "def generate_asset(resource, out_storage: ExplanationStorage): out_storage.clear(); for explanation in resource: r = copy(explanation); for functor in resource.modifiers: if r is None: break; r = functor(r); if r is not None and len(out_storage) < 100: out_storage.add_entry(r)",
+      "def generate_asset(resource, out_storage: ExplanationStorage): out_storage.clear(); for explanation in resource: r = copy(explanation); for functor in resource.modifiers: if r is None: break; r = functor(r); if r is not None and len(out_storage) > 100: out_storage.add_entry(r)",
+      "def generate_asset(resource, out_storage: ExplanationStorage): out_storage.clear(); for explanation in resource: r = copy(explanation); for functor in resource.modifiers: if r is None: break; r = functor(r); if r is not None and len(out_storage) == 0: out_storage.add_entry(r)",
+      "def generate_asset(resource, out_storage: ExplanationStorage): out_storage.clear(); for explanation in resource: r = copy(explanation); for functor in resource.modifiers: if r is None: break; r = functor(r); if r is not None and len(out_storage) > 1000: out_storage.add_entry(r)",
+      "def generate_asset(resource, out_storage: ExplanationStorage): out_storage.clear(); for explanation in resource: r = copy(explanation); for functor in resource.modifiers: if r is None: break; r = functor(r); if r is not None and len(out_storage) < 10: out_storage.add_entry(r)"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Siblings to forum serializer",
+    "code": "class ForumSerializer(serializers.ModelSerializer):\n    description = serializers.SerializerMethodField()\n    previous_sibling = serializers.SerializerMethodField()\n    next_sibling = serializers.SerializerMethodField()\n\n    class Meta:\n        model = Forum\n        fields = [\n            'id', 'name', 'slug', 'type', 'description', 'image', 'link', 'link_redirects',\n            'posts_count', 'topics_count', 'link_redirects_count', 'last_post_on',\n            'display_sub_forum_list', 'lft', 'rght', 'tree_id', 'level', 'parent',\n            'previous_sibling', 'next_sibling',\n        ]\n\n    def get_description(self, obj):\n        return obj.description.rendered\n\n    def get_previous_sibling(self, obj):\n        sibling = obj.get_previous_sibling()\n        return sibling.pk if sibling else None\n\n    def get_next_sibling(self, obj):\n        sibling = obj.get_next_sibling()\n        return sibling.pk if sibling else None",
+    "perturbations": [
+      "def get_description(self, obj): return obj.description",
+      "def get_previous_sibling(self, obj): sibling = obj.get_previous_sibling(); return sibling.pk if sibling else 'null'",
+      "def get_next_sibling(self, obj): sibling = obj.get_next_sibling(); return sibling.pk if sibling else 'null'",
+      "def get_description(self, obj): return obj.description.rendered + 'wrong'",
+      "def get_previous_sibling(self, obj): sibling = obj.get_previous_sibling(); return sibling.pk + 'wrong'"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "The parallel env variable test to reset the env correctly",
+    "code": "class TestParallelEnvVariable(unittest.TestCase):\n    \"\"\"\n    Tests environment variables related to the underlying \"parallel\"\n    functions for npyufuncs.\n    \"\"\"\n\n    _numba_parallel_test_ = False\n\n    def test_num_threads_variable(self):\n        \"\"\"\n        Tests the NUMBA_NUM_THREADS env variable behaves as expected.\n        \"\"\"\n        key = 'NUMBA_NUM_THREADS'\n        current = str(getattr(env, key, config.NUMBA_DEFAULT_NUM_THREADS))\n        threads = \"3154\"\n        env[key] = threads\n        try:\n            config.reload_config()\n        except RuntimeError as e:\n            # This test should fail if threads have already been launched\n            self.assertIn(\"Cannot set NUMBA_NUM_THREADS\", e.args[0])\n        else:\n            self.assertEqual(threads, str(get_thread_count()))\n            self.assertEqual(threads, str(config.NUMBA_NUM_THREADS))\n        finally:\n            # reset the env variable/set to default. Should not fail even if\n            # threads are launched because the value is the same.\n            env[key] = current\n            config.reload_config()\n",
+    "perturbations": [
+      "def test_num_threads_variable(self): env[key] = '123'",
+      "def test_num_threads_variable(self): threads = '3154' * 2",
+      "def test_num_threads_variable(self): config.NUMBA_NUM_THREADS = '123'",
+      "def test_num_threads_variable(self): self.assertEqual(threads, str(get_thread_count()))",
+      "def test_num_threads_variable(self): self.assertIn('Cannot set NUMBA_NUM_THREADS', e.args[0])"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Load user from migration registry when creating system user",
+    "code": "def add_user(apps, *args):\n    User = apps.get_model('ideascube', 'User')\n    User(serial='__system__', full_name='System', password='!!').save()\n\n",
+    "perturbations": [
+      "def add_user(apps, *args): return User.objects.create(serial='__system__', full_name='System', password='!!')",
+      "def add_user(apps, *args): return User(serial='__system__', full_name='System', password='!!').save()",
+      "def add_user(apps, *args): return User(serial='__system__', full_name='System', password='!!!').save()",
+      "def add_user(apps, *args): return User(serial='__system__', full_name='System', password='!!', email='sys@example.com').save()",
+      "def add_user(apps, *args): return User(serial='__system__', full_name='System', password='!!', age=0).save()"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Break out dispatch, and drop prepare. Easier testing",
+    "code": "class View:\n\n    def __call__(self, event, context):\n        kwargs = event.get('pathParameters') or {}\n        self.dispatch(request, **kwargs)\n\n    def dispatch(self, request, **kwargs):\n        func = getattr(self, request.method.lower())\n        try:\n            resp = func(request, **kwargs)\n        except:\n            import traceback\n            log.error(self)\n            log.error(traceback.format_exc())\n            return response(body='Internal server Error', status=500)\n        if isinstance(resp, Response):\n            resp = resp.render()\n        return resp\n\n    def prepare(self, request):\n        pass",
+    "perturbations": [
+      "def dispatch(self, request, **kwargs):\n    func = getattr(self, 'unknown_method')\n    try:\n        resp = func(request, **kwargs)\n    except:\n        import traceback\n        log.error(self)\n        log.error(traceback.format_exc())\n        return response(body='Internal server Error', status=500)\n    if isinstance(resp, Response):\n        resp = resp.render()\n    return resp",
+      "def dispatch(self, request, **kwargs):\n    func = getattr(self, 'dispatch')\n    try:\n        resp = func(request)\n    except:\n        import traceback\n        log.error(self)\n        log.error(traceback.format_exc())\n        return response(body='Internal server Error', status=500)\n    if isinstance(resp, Response):\n        resp = resp.render()\n    return resp",
+      "def dispatch(self, request, **kwargs):\n    func = getattr(self, 'unknown_method')\n    try:\n        resp = func(request, **kwargs)\n    except:\n        import traceback\n        log.error(self)\n        log.error(traceback.format_exc())\n        return response(body='Internal server Error', status=500)\n    if isinstance(resp, Response):\n        resp = resp.render()\n    return resp",
+      "def dispatch(self, request, **kwargs):\n    func = getattr(self, 'dispatch')\n    try:\n        resp = func(request)\n    except:\n        import traceback\n        log.error(self)\n        log.error(traceback.format_exc())\n        return response(body='Internal server Error', status=500)\n    if isinstance(resp, Response):\n        resp = resp.render()\n    return resp",
+      "def dispatch(self, request, **kwargs):\n    func = getattr(self, 'unknown_method')\n    try:\n        resp = func(request, **kwargs)\n    except:\n        import traceback\n        log.error(self)\n        log.error(traceback.format_exc())\n        return response(body='Internal server Error', status=500)\n    if isinstance(resp, Response):\n        resp = resp.render()\n    return resp"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Tf session not being set as default",
+    "code": "class TensorFlowKernel(Kernel):\n    def __init__(self, config):\n        # If this is a CPU kernel, tell TF that it should not use\n        # any GPUs for its graph operations\n        cpu_only = True\n        visible_device_list = []\n        tf_config = tf.ConfigProto()\n        for handle in config.devices:\n            if handle.type == DeviceType.GPU.value:\n                visible_device_list.append(str(handle.id))\n                cpu_only = False\n        if cpu_only:\n            tf_config.device_count['GPU'] = 0\n        else:\n            tf_config.gpu_options.visible_device_list = ','.join(visible_device_list)\n        # TODO: wrap this in \"with device\"\n        self.config = config\n        self.tf_config = tf_config\n        self.graph = self.build_graph()\n        self.sess = tf.Session(config=self.tf_config, graph=self.graph)\n        self.sess.as_default()\n        self.protobufs = config.protobufs\n\n    def close(self):\n        self.sess.close()\n\n    def build_graph(self):\n        raise NotImplementedError\n\n    def execute(self):\n        raise NotImplementedError",
+    "perturbations": [
+      "def TensorFlowKernel(config):\n    cpu_only = True\n    visible_device_list = []\n    tf_config = tf.ConfigProto()\n    for handle in config.devices:\n        if handle.type == DeviceType.GPU.value:\n            visible_device_list.append(str(handle.id))\n            cpu_only = False\n    if cpu_only:\n        tf_config.device_count['GPU'] = 0\n    else:\n        tf_config.gpu_options.visible_device_list = ','.join(visible_device_list)\n    # TODO: wrap this in \"with device\"\n    self.config = config\n    self.tf_config = tf_config\n    self.graph = self.build_graph()\n    self.sess = tf.Session(config=self.tf_config, graph=self.graph)\n    # self.sess.as_default() <-- Incorrect line\n    self.protobufs = config.protobufs\n",
+      "def example():\n    cpu_only = True\n    visible_device_list = []\n    tf_config = tf.ConfigProto()\n    for handle in config.devices:\n        if handle.type == DeviceType.GPU.value:\n            visible_device_list.append(str(handle.id))\n            cpu_only = False\n    if cpu_only:\n        tf_config.gpu_options.visible_device_list = 0\n    else:\n        tf_config.gpu_options.visible_device_list = ','.join(visible_device_list)\n    # TODO: wrap this in \"with device\"\n    self.config = config\n    self.tf_config = tf_config\n    self.graph = self.build_graph()\n    self.sess = tf.Session(config=self.tf_config, graph=self.graph)\n    self.sess.as_default() <-- Incorrect line\n    self.protobufs = config.protobufs\n",
+      "def example():\n    cpu_only = True\n    visible_device_list = []\n    tf_config = tf.ConfigProto()\n    for handle in config.devices:\n        if handle.type == DeviceType.GPU.value:\n            visible_device_list.append(str(handle.id))\n            cpu_only = False\n    if cpu_only:\n        tf_config.gpu_options.visible_device_list = 'GPU0'\n    else:\n        tf_config.gpu_options.visible_device_list = ','.join(visible_device_list)\n    # TODO: wrap this in \"with device\"\n    self.config = config\n    self.tf_config = tf_config\n    self.graph = self.build_graph()\n    self.sess = tf.Session(config=self.tf_config, graph=self.graph)\n    self.sess.as_default() <-- Incorrect line\n    self.protobufs = config.protobufs\n",
+      "def example():\n    cpu_only = True\n    visible_device_list = []\n    tf_config = tf.ConfigProto()\n    for handle in config.devices:\n        if handle.type == DeviceType.GPU.value:\n            visible_device_list.append(str(handle.id))\n            cpu_only = False\n    if cpu_only:\n        tf_config.gpu_options.visible_device_list = 'GPU0'\n    else:\n        tf_config.gpu_options.visible_device_list = ','.join(visible_device_list)\n    # TODO: wrap this in \"with device\"\n    self.config = config\n    self.tf_config = tf_config\n    self.graph = self.build_graph()\n    self.sess = tf.Session(config=self.tf_config, graph=self.graph)\n    self.sess.as_default() <-- Incorrect line\n    self.protobufs = config.protobufs\n",
+      "def example():\n    cpu_only = True\n    visible_device_list = []\n    tf_config = tf.ConfigProto()\n    for handle in config.devices:\n        if handle.type == DeviceType.GPU.value:\n            visible_device_list.append(str(handle.id))\n            cpu_only = False\n    if cpu_only:\n        tf_config.gpu_options.visible_device_list = 'GPU0'\n    else:\n        tf_config.gpu_options.visible_device_list = ','.join(visible_device_list)\n    # TODO: wrap this in \"with device\"\n    self.config = config\n    self.tf_config = tf_config\n    self.graph = self.build_graph()\n    self.sess = tf.Session(config=self.tf_config, graph=self.graph)\n    self.sess.as_default() <-- Incorrect line\n    self.protobufs = config.protobufs"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Allow SiteOption to load into the JS",
+    "code": "def trunkplayer_js_config(user):\n    js_settings = getattr(settings, 'JS_SETTINGS', None)\n    js_json = {}\n    if js_settings:\n        for setting in js_settings:\n                set_val = getattr(settings, setting, '')\n                js_json[setting] = set_val\n    for opt in SiteOption.objects.filter(javascript_visible=True):\n        js_json[opt.name] = opt.value_boolean_or_string()\n    js_json['user_is_staff'] = user.is_staff\n    if user.is_authenticated():\n        js_json['user_is_authenticated'] = True\n    else:\n        js_json['user_is_authenticated'] = False\n    js_json['radio_change_unit'] = user.has_perm('radio.change_unit')\n    return json.dumps(js_json)",
+    "perturbations": [
+      "def trunkplayer_js_config(user): js_json = {'user_is_staff': user.is_staff}; return json.dumps(js_json)",
+      "def trunkplayer_js_config(user): js_settings = getattr(settings, 'JS_SETTINGS', None); if js_settings: for setting in js_settings: set_val = getattr(settings, setting, ''); js_json[setting] = set_val; for opt in SiteOption.objects.filter(javascript_visible=True): js_json[opt.name] = opt.value_boolean_or_string(); return json.dumps(js_json)",
+      "def trunkplayer_js_config(user): js_settings = getattr(settings, 'JS_SETTINGS', None); if js_settings: for setting in js_settings: set_val = getattr(settings, setting, ''); js_json[setting] = set_val; for opt in SiteOption.objects.filter(javascript_visible=True): js_json[opt.name] = opt.value_boolean_or_string(); return json.dumps(js_json)",
+      "def trunkplayer_js_config(user): js_settings = getattr(settings, 'JS_SETTINGS', None); if js_settings: for setting in js_settings: set_val = getattr(settings, setting, ''); js_json[setting] = set_val; for opt in SiteOption.objects.filter(javascript_visible=True): js_json[opt.name] = opt.value_boolean_or_string(); return json.dumps(js_json)",
+      "def trunkplayer_js_config(user): js_settings = getattr(settings, 'JS_SETTINGS', None); if js_settings: for setting in js_settings: set_val = getattr(settings, setting, ''); js_json[setting] = set_val; for opt in SiteOption.objects.filter(javascript_visible=True): js_json[opt.name] = opt.value_boolean_or_string(); return json.dumps(js_json)"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Use commit suggestion to use types",
+    "code": "def keys(tmp_path):\n    pub_key = tmp_path / \"ssh\" / \"testkey.pub\"\n    priv_key = tmp_path / \"ssh\" / \"testkey\"\n    return types.SimpleNamespace(pub_key=pub_key, priv_key=priv_key)\n\n",
+    "perturbations": [
+      "def keys(tmp_path): return SimpleNamespace(pub_key=tmp_path / 'ssh' / 'testkey.pub', priv_key=tmp_path / 'ssh' / 'testkey')",
+      "def keys(tmp_path): return SimpleNamespace(pub_key=tmp_path / 'ssh' / 'testkey.pub', priv_key=tmp_path / 'ssh' / 'testkey.pub')",
+      "def keys(tmp_path): return SimpleNamespace(pub_key=tmp_path / 'ssh' / 'testkey.pub', priv_key=tmp_path / 'ssh' / 'testkey.pub.pub')",
+      "def keys(tmp_path): return SimpleNamespace(pub_key=tmp_path / 'ssh' / 'testkey.pub.pub', priv_key=tmp_path / 'ssh' / 'testkey.pub')",
+      "def keys(tmp_path): return SimpleNamespace(pub_key=tmp_path / 'ssh' / 'testkey.pub', priv_key=tmp_path / 'ssh' / 'testkeys')"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Set default values for fields",
+    "code": "class ITodo(model.Schema):\n    title = schema.TextLine(\n        title=u\"Title\",\n        required=False,\n        description=u\"It's a title\",\n        default=u''\n    )\n    done = schema.Bool(\n        title=u\"Done\",\n        required=False,\n        description=u\"Has the task been completed?\",\n        default=False\n    )\n\n",
+    "perturbations": [
+      "def example(): return {'title': 'example', 'done': True}",
+      "def example(): return {'title': None, 'done': False}",
+      "def example(): return {'title': '', 'done': 'True'}",
+      "def example(): return {'title': 'example', 'done': 0}",
+      "def example(): return {'title': 'example', 'done': True}"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Refresh system instead of clobbering it",
+    "code": "def UpdateTrustedSystem(file_name):\n    \"\"\"Make sure the TrustedSystem object is up to date.\"\"\"\n    global my_system\n    if 'my_system' not in globals():\n        my_system = libvtd.trusted_system.TrustedSystem()\n        my_system.AddFile(file_name)\n    my_system.Refresh()",
+    "perturbations": [
+      "def UpdateTrustedSystem(file_name):\n    global my_system\n    if 'my_system' not in globals():\n        my_system = libvtd.trusted_system.TrustedSystem()\n        my_system.AddFile(file_name)\n    my_system.Refresh()",
+      "def UpdateTrustedSystem(file_name):\n    global my_system\n    if 'my_system' not in globals():\n        my_system = libvtd.trusted_system.TrustedSystem()\n        my_system.addFile(file_name)\n    my_system.refresh()",
+      "def UpdateTrustedSystem(file_name):\n    global my_system\n    if 'my_system' not in globals():\n        my_system = libvtd.trusted_system.TrustedSystem()\n        my_system.add_file(file_name)\n    my_system.update()",
+      "def UpdateTrustedSystem(file_name):\n    global my_system\n    if 'my_system' not in globals():\n        my_system = libvtd.trusted_system.TrustedSystem()\n        my_system.addFile(file_name)\n    my_system.update()",
+      "def UpdateTrustedSystem(file_name):\n    global my_system\n    if 'my_system' not in globals():\n        my_system = libvtd.trusted_system.TrustedSystem()\n        my_system.Addfile(file_name)\n    my_system.Refresh()"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Use a real path when testing sites.",
+    "code": "class TestSite(TestCase):\n\n    def test_finds_valid_site_root_from_templates(self):\n        original = os.getcwd()\n        valid_site = os.path.realpath(tempfile.mkdtemp())\n        open(os.path.join(valid_site, 'template.html'), 'w').close()\n        os.chdir(valid_site)\n\n        site = Site()\n\n        self.assertEqual(valid_site, site.path)\n        os.chdir(original)\n\n    def test_finds_valid_site_root_from_conf(self):\n        original = os.getcwd()\n        valid_site = os.path.realpath(tempfile.mkdtemp())\n        open(os.path.join(valid_site, Site.CONFIG), 'w').close()\n        os.chdir(valid_site)\n\n        site = Site()\n\n        self.assertEqual(valid_site, site.path)\n        os.chdir(original)\n\n    def test_site_has_absolute_path(self):\n        original = os.getcwd()\n        tempdir = os.path.realpath(tempfile.mkdtemp())\n        site_path = os.path.join(tempdir, 'site')\n        os.mkdir(site_path)\n        os.chdir(tempdir)\n\n        site = Site('site')\n\n        self.assertEqual(site_path, site.path)\n        os.chdir(original)",
+    "perturbations": [
+      "def test_finds_valid_site_root_from_templates(self):\n    original = os.getcwd()\n    valid_site = os.path.realpath(tempfile.mkdtemp())\n    open(os.path.join(valid_site, 'template.html'), 'w').close()\n    os.chdir(valid_site)\n\n    site = Site('site')\n\n    self.assertEqual(valid_site, site.path)\n    os.chdir(original)",
+      "def test_finds_valid_site_root_from_conf(self):\n    original = os.getcwd()\n    valid_site = os.path.realpath(tempfile.mkdtemp())\n    open(os.path.join(valid_site, Site.CONFIG), 'w').close()\n    os.chdir(valid_site)\n\n    site = Site('site')\n\n    self.assertEqual(valid_site, site.path)\n    os.chdir(original)",
+      "def test_site_has_absolute_path(self):\n    original = os.getcwd()\n    tempdir = os.path.realpath(tempfile.mkdtemp())\n    site_path = os.path.join(tempdir, 'site')\n    os.mkdir(site_path)\n    os.chdir(tempdir)\n\n    site = Site('site')\n\n    self.assertEqual(site_path, site.path)\n    os.chdir(original)",
+      "def test_finds_valid_site_root_from_templates(self):\n    original = os.getcwd()\n    valid_site = os.path.realpath(tempfile.mkdtemp())\n    open(os.path.join(valid_site, 'template.html'), 'w').close()\n    os.chdir(valid_site)\n\n    site = Site('site')\n\n    self.assertEqual(valid_site, site.path)\n    os.chdir(original)",
+      "def test_finds_valid_site_root_from_conf(self):\n    original = os.getcwd()\n    valid_site = os.path.realpath(tempfile.mkdtemp())\n    open(os.path.join(valid_site, Site.CONFIG), 'w').close()\n    os.chdir(valid_site)\n\n    site = Site('site')\n\n    self.assertEqual(valid_site, site.path)\n    os.chdir(original)"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Change Pool to use ProcessPoolExecutor",
+    "code": "class PoolMetaclass(type):\n\n    __instances__ = dict()\n    __blacklist__ = ('Pool', 'PoolMetaclass')\n\n    def __new__(cls, name, bases, attrs):\n\n        if name in cls.__blacklist__:\n            return super(PoolMetaclass, cls).__new__(cls, name,\n                                                     bases, attrs)\n\n        pool_key = attrs.get('pool_key') or '{}Pool'.format(name)\n        new_class = super(PoolMetaclass, cls).__new__(cls, pool_key,\n                                                      bases, attrs)\n\n        setattr(new_class, 'pool_key', pool_key)\n\n        if pool_key not in cls.__instances__:\n            cls.__instances__[pool_key] = new_class\n\n        return cls.__instances__[pool_key]\n\n",
+    "perturbations": [
+      "def PoolMetaclass(name, bases, attrs):\n    __instances__ = dict()\n    __blacklist__ = ('Pool', 'PoolMetaclass')\n\n    def __new__(cls, name, bases, attrs):\n        if name in cls.__blacklist__:\n            return super(PoolMetaclass, cls).__new__(cls, name,\n                                                     bases, attrs)\n\n        pool_key = attrs.get('pool_key') or '{}Pool'.format(name)\n        new_class = super(PoolMetaclass, cls).__new__(cls, pool_key,\n                                                     bases, attrs)\n\n        setattr(new_class, 'pool_key', pool_key)\n\n        if pool_key not in cls.__instances__:\n            cls.__instances__[pool_key] = new_class\n\n        return cls.__instances__[pool_key]\n\n    return PoolMetaclass",
+      "def example():\n    pass",
+      "def example():\n    x = '123'\n    y = 456\n    return x + y",
+      "def example():\n    pool = Pool()\n    pool.map(lambda x: x * 2, [1, 2, 3])",
+      "def example():\n    pool = Pool()\n    pool.map(lambda x: x + 1, [])"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Teardown of integration test",
+    "code": "class TestPropagation(object):\n    def setup_method(self, method):\n        self.servers = Group()\n\n        for port in range(4):\n            ns = MagicMock()\n            ns.port = 9812 + port\n\n            server = KittenServer(ns)\n            self.servers.spawn(server.listen_forever)\n\n    def teardown_method(self, method):\n        self.servers.kill(timeout=1)\n\n    def test_node_propagation(self):\n        \"\"\"\n        Tests that check node propagation\n\n        1) Spin up four servers.\n        2) Make the first one send a sync request to all three others.\n        3) Count the numbers of requests made.\n        4) Check databases to see that they all know each other.\n\n        \"\"\"\n\n        pass",
+    "perturbations": [
+      "def teardown_method(self, method): self.servers.kill(timeout=0)",
+      "def test_node_propagation(self): pass",
+      "def setup_method(self, method): self.servers = Group().spawn(KittenServer(MagicMock(port=9812)).listen_forever)",
+      "def teardown_method(self, method): self.servers.kill()",
+      "def test_node_propagation(self): pass"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Change single quotes to double",
+    "code": "class TestStats(unittest.TestCase):\n\n    def test_cli(self):\n        \"\"\"\n        Test command line arguments.\n        \"\"\"\n        count = ghstats.main_cli([\"kefir500/apk-icon-editor\", \"-q\", \"-d\"])\n        self.assertTrue(count > 0)\n\n    def test_releases(self):\n        \"\"\"\n        Download all releases.\n        \"\"\"\n        stats = ghstats.download_stats(\"kefir500\", \"apk-icon-editor\", None, False, ghstats.get_env_token(), False)\n        self.assertTrue(isinstance(stats, list))\n        count = ghstats.get_stats_downloads(stats, True)\n        self.assertTrue(count > 0)\n\n    def test_release(self):\n        \"\"\"\n        Download latest release.\n        \"\"\"\n        stats = ghstats.download_stats(\"kefir500\", \"apk-icon-editor\", None, True, ghstats.get_env_token(), False)\n        self.assertTrue(isinstance(stats, dict))\n        count = ghstats.get_stats_downloads(stats, True)\n        self.assertTrue(count > 0)\n\n    def test_invalid(self):\n        \"\"\"\n        Check nonexistent repository.\n        \"\"\"\n        self.assertRaises(ghstats.GithubRepoError,\n                          lambda: ghstats.download_stats(\"kefir500\", \"foobar\", None, False,\n                                                         ghstats.get_env_token(), True))\n\n",
+    "perturbations": [
+      "def test_cli(self):\n    count = ghstats.main_cli(['kefir500/apk-icon-editor', '-q', '-d'])\n    self.assertTrue(count > '0')",
+      "def test_releases(self):\n    stats = ghstats.download_stats('kefir500', 'apk-icon-editor', None, False, ghstats.get_env_token(), False)\n    self.assertTrue(isinstance(stats, list))\n    count = ghstats.get_stats_downloads(stats, True)\n    self.assertTrue(count > 1)",
+      "def test_release(self):\n    stats = ghstats.download_stats('kefir500', 'apk-icon-editor', None, True, ghstats.get_env_token(), False)\n    self.assertTrue(isinstance(stats, dict))\n    count = ghstats.get_stats_downloads(stats, True)\n    self.assertTrue(count > 2)",
+      "def test_invalid(self):\n    self.assertRaises(ghstats.GithubRepoError,\n      lambda: ghstats.download_stats('kefir500', 'foobar', None, False,\n                                           ghstats.get_env_token(), True))",
+      "def example():\n  x = 1\n  y = 2\n  if x > 'y':\n    print('x is greater than y')"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Match_distance flag to load_data_frame()",
+    "code": "def load_data_frame(data_frame_path, sort_reindex=False, class_labels=True, match_distance=False):\n    \"\"\"\n    Load a sentence data set as pandas DataFrame from a given path.\n\n    :param data_frame_path: the path to load the pandas DataFrame from\n    :param sort_reindex: if True, the returned data frame will be sorted by PMID and reindex by 0, 1, 2, ...\n    :param class_labels: if True, the class label is assumed to be present as the second-to-last column\n    :param match_distance: if True, the distance between the closest match is assumed to be present as the last column\n    :return: a pandas DataFrame loaded from the given path\n    \"\"\"\n    column_names = ['pmid', 'paragraph', 'sentence', 'entity1', 'entity2', 'sentence_text']\n    if class_labels:\n        column_names.append('class')\n    if match_distance:\n        column_names.append('distance')\n    data_df = pd.read_csv(data_frame_path, sep='\\t', header=None, index_col=False,\n                          names=column_names)\n    if sort_reindex:\n        data_df.sort_values('pmid', axis=0, inplace=True, kind='mergesort')\n        data_df.reset_index(inplace=True, drop=True)\n    assert data_df.isnull().sum().sum() == 0\n    return data_df",
+    "perturbations": [
+      "def load_data_frame(data_frame_path, sort_reindex=False, class_labels=True, match_distance=False):\n    column_names = ['pmid', 'paragraph', 'sentence', 'entity1', 'entity2', 'distance']\n    if class_labels:\n        column_names.append('class')\n    if match_distance:\n        column_names.append('distance')\n    data_df = pd.read_csv(data_frame_path, sep='\t', header=None, index_col=False,\n                          names=column_names)\n    if sort_reindex:\n        data_df.sort_values('pmid', axis=0, inplace=True, kind='mergesort')\n        data_df.reset_index(inplace=True, drop=True)\n    assert data_df.isnull().sum().sum() == 0\n    return data_df",
+      "def load_data_frame(data_frame_path, sort_reindex=False, class_labels=True, match_distance=False):\n    column_names = ['pmid', 'paragraph', 'sentence', 'entity1', 'entity2', 'class']\n    if class_labels:\n        column_names.append('distance')\n    if match_distance:\n        column_names.append('distance')\n    data_df = pd.read_csv(data_frame_path, sep='\t', header=None, index_col=False,\n                          names=column_names)\n    if sort_reindex:\n        data_df.sort_values('pmid', axis=0, inplace=True, kind='mergesort')\n        data_df.reset_index(inplace=True, drop=True)\n    assert data_df.isnull().sum().sum() == 0\n    return data_df",
+      "def load_data_frame(data_frame_path, sort_reindex=False, class_labels=True, match_distance=False):\n    column_names = ['pmid', 'paragraph', 'sentence', 'entity1', 'entity2', 'distance']\n    if class_labels:\n        column_names.append('class')\n    if match_distance:\n        column_names.append('distance')\n    data_df = pd.read_csv(data_frame_path, sep='\t', header=None, index_col=False,\n                          names=column_names)\n    if sort_reindex:\n        data_df.sort_values('pmid', axis=0, inplace=True, kind='mergesort')\n        data_df.reset_index(inplace=True, drop=True)\n    assert data_df.isnull().sum().sum() == 0\n    return data_df",
+      "def load_data_frame(data_frame_path, sort_reindex=False, class_labels=True, match_distance=False):\n    column_names = ['pmid', 'paragraph', 'sentence', 'entity1', 'entity2']\n    if class_labels:\n        column_names.append('class')\n    if match_distance:\n        column_names.append('distance')\n    data_df = pd.read_csv(data_frame_path, sep='\t', header=None, index_col=False,\n                          names=column_names)\n    if sort_reindex:\n        data_df.sort_values('pmid', axis=0, inplace=True, kind='mergesort')\n        data_df.reset_index(inplace=True, drop=True)\n    assert data_df.isnull().sum().sum() == 0\n    return data_df",
+      "def load_data_frame(data_frame_path, sort_reindex=False, class_labels=True, match_distance=False):\n    column_names = ['pmid', 'paragraph', 'sentence', 'entity1', 'entity2']\n    if class_labels:\n        column_names.append('class')\n    if match_distance:\n        column_names.append('distance')\n    data_df = pd.read_csv(data_frame_path, sep='\t', header=None, index_col=False,\n                          names=column_names)\n    if sort_reindex:\n        data_df.sort_values('pmid', axis=0, inplace=True, kind='mergesort')\n        data_df.reset_index(inplace=True, drop=True)\n    assert data_df.isnull().sum().sum() == 1\n    return data_df"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Use the REST client get_or_create helper function.",
+    "code": "def sync_session(project, collection, subject, session, filename):\n    \"\"\"\n    Updates the qiprofile database from the XNAT database content for\n    the given session.\n\n    :param project: the XNAT project name\n    :param collection: the image collection name\n    :param subject: the subject number\n    :param session: the XNAT session number\n    :param filename: the XLS input file location\n    \"\"\"\n    # Get or create the subject database subject.\n    key = dict(project=project, collection=collection, number=subject)\n    sbj = database.get_or_create(Subject, key)\n    # Update the clinical information from the XLS input.\n    clinical.sync(sbj, filename)\n    # Update the imaging information from XNAT.\n    imaging.sync(sbj, session)",
+    "perturbations": [
+      "def sync_session(project, collection, subject, session, filename):\n    sbj = database.get_or_create(Subject, dict(project=project, collection=collection, number=subject))\n    clinical.sync(sbj, filename)\n    imaging.sync(sbj, session)",
+      "def sync_session(project, collection, subject, session, filename):\n    key = {\"project\": project, \"collection\": collection, \"number\": subject}\n    sbj = database.get_or_create(Subject, key)\n    clinical.sync(sbj, filename)\n    imaging.sync(sbj, session)",
+      "def sync_session(project, collection, subject, session, filename):\n    sbj = database.get_or_create(Subject, dict(project=project, collection=collection, number='subject'))\n    clinical.sync(sbj, filename)\n    imaging.sync(sbj, session)",
+      "def sync_session(project, collection, subject, session, filename):\n    key = {\"project\": project, \"collection\": 'collection', \"number\": subject}\n    sbj = database.get_or_create(Subject, key)\n    clinical.sync(sbj, filename)\n    imaging.sync(sbj, session)",
+      "def sync_session(project, collection, subject, session, filename):\n    sbj = database.get_or_create(Subject, dict(project=project, collection='collection', number=subject))\n    clinical.sync(sbj, filename)\n    imaging.sync(sbj, session)"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Make (pre|post)_migrate scripts for the index table only if working on 'transient'.",
+    "code": "def create_index(sender, **kwargs):\n    if (kwargs['using'] == 'transient' and isinstance(sender, SearchConfig)):\n        create_index_table(force=True)\n\n",
+    "perturbations": [
+      "def create_index(sender, **kwargs):\n    if (kwargs['using'] == 'transient' and sender is not None):\n        create_index_table(force=True)",
+      "def create_index(sender, **kwargs):\n    if (kwargs['using'] == 'transient' and isinstance(sender, SearchConfig) and sender.__class__.__name__ == 'SearchConfig'):\n        create_index_table(force=True)",
+      "def create_index(sender, **kwargs):\n    if (kwargs['using'] == 'transient' and isinstance(sender, SearchConfig) and isinstance(sender, object)):\n        create_index_table(force=True)",
+      "def create_index(sender, **kwargs):\n    if (kwargs['using'] == 'transient' and kwargs.get('sender', None) is not None):\n        create_index_table(force=True)",
+      "def create_index(sender, **kwargs):\n    if (kwargs['using'] == 'transient' and kwargs.get('sender', None) is sender):\n        create_index_table(force=True)"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Simplify the code for downloading resources.",
+    "code": "def download_resource(resources):\n    for filename, resource in resources.items():\n        print \"Downloading %s\" % filename\n\n        filename = os.path.join(config.resources_directory, filename)\n        yield downloadPage(resource['url'], filename)\n\n        if resource['action'] is not None:\n            yield defer.maybeDeferred(resource['action'],\n                                      filename,\n                                      *resource['action_args'])\n        print \"%s written.\" % filename\n\n",
+    "perturbations": [
+      "def download_resource(resources): for filename, resource in resources.items(): print 'Downloading %s' % filename; filename = os.path.join(config.resources_directory, filename); yield downloadPage(resource['url'], filename); if resource['action'] is not None: yield defer.maybeDeferred(resource['action'], filename, *resource['action_args']); print 'WRONG OUTPUT HERE!!'; filename = os.path.join(config.resources_directory, filename); yield downloadPage(resource['url'], filename); if resource['action'] is not None: yield defer.maybeDeferred(resource['action'], filename, *resource['action_args']); print 'WRONG OUTPUT HERE!!'",
+      "def download_resource(resources): for filename, resource in resources.items(): print 'Downloading %s' % filename; filename = os.path.join(config.resources_directory, filename); yield downloadPage(resource['url'], filename); if resource['action'] is not None: yield defer.maybeDeferred(resource['action'], filename, *resource['action_args']); print 'WRONG OUTPUT HERE!!'; filename = os.path.join(config.resources_directory, filename); yield downloadPage('wrong_url', filename); if resource['action'] is not None: yield defer.maybeDeferred(resource['action'], filename, *resource['action_args']); print 'WRONG OUTPUT HERE!!'",
+      "def download_resource(resources): for filename, resource in resources.items(): print 'Downloading %s' % filename; filename = os.path.join(config.resources_directory, filename); yield downloadPage(resource['url'], filename); if resource['action'] is not None: yield defer.maybeDeferred('wrong_action', filename, *resource['action_args']); print 'WRONG OUTPUT HERE!!'; filename = os.path.join(config.resources_directory, filename); yield downloadPage(resource['url'], filename); if resource['action'] is not None: yield defer.maybeDeferred('wrong_action', filename, *resource['action_args']); print 'WRONG OUTPUT HERE!!'",
+      "def download_resource(resources): for filename, resource in resources.items(): print 'Downloading %s' % filename; filename = os.path.join(config.resources_directory, filename); yield downloadPage(resource['url'], filename); if resource['action'] is not None: yield defer.maybeDeferred('wrong_action', filename, *resource['action_args']); print 'WRONG OUTPUT HERE!!'; filename = os.path.join(config.resources_directory, filename); yield downloadPage('wrong_url', filename); if resource['action'] is not None: yield defer.maybeDeferred('wrong_action', filename, *resource['action_args']); print 'WRONG OUTPUT HERE!!'",
+      "def download_resource(resources): for filename, resource in resources.items(): print 'Downloading %s' % filename; filename = os.path.join(config.resources_directory, filename); yield downloadPage(resource['url'], filename); if resource['action'] is not None: yield defer.maybeDeferred('wrong_action', filename, *resource['action_args']); print 'WRONG OUTPUT HERE!!'; filename = os.path.join(config.resources_directory, filename); yield downloadPage('wrong_url', filename); if resource['action'] is not None: yield defer.maybeDeferred(resource['action'], filename, 'wrong_arg'); print 'WRONG OUTPUT HERE!!'"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Rename image_pub to image_publisher; change docstring.",
+    "code": "class ImageFeature(object):\n    \"\"\"\n    A ROS image Publisher/Subscriber.\n\n    \"\"\"\n    def __init__(self):\n        self.image_subscriber = rospy.Subscriber(\"/ardrone/image_raw\",\n                                                 Image, self.image_callback,\n                                                 queue_size=1)\n        self.image_publisher = rospy.Publisher(\"/output/slow_image_raw\",\n                                               Image, queue_size=1)\n        rospy.logdebug(\"Subscribed to /ardrone/image_raw\")\n        self.count = 0\n\n    def frame_callback(self, frame):\n        \"\"\"\n        Callback function of subscribed topic.\n\n        \"\"\"\n        # Publish every fifteenth frame\n        if not self.count % 15:\n            self.image_publisher.publish(frame)\n        self.count += 1\n\n",
+    "perturbations": [
+      "def image_pub(self): ...",
+      "def frame_callback(self, frame): ...",
+      "def __init__(self): ...",
+      "def image_publisher(self): ...",
+      "def count(self): ..."
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "\"x,y should be y,x\"",
+    "code": "class Person(object):\n    \"\"\"\n    Base class for all characters in game.\n    \"\"\"\n    DEFAULT_HEALTH = 100\n\n    def __init__(self, health=DEFAULT_HEALTH, position):\n        \"\"\"\n        Defaults to facing north. Facing codes:\n        - 0: North\n        - 1: East\n        - 2: South\n        - 3: West\n\n        @param health The health that is given at init.\n        @param position [x, y] the position at init.\n        \"\"\"\n        if not isinstance(position, (tuple, list)):\n            logging.error(\n                \"Position should be tuple/list with [x, y], set it to [0, 0]\"\n            )\n            position = [0, 0]\n\n        self.health, self.position, self.facing = health, position, 0\n",
+    "perturbations": [
+      "def example(self): self.health, self.position = self.position, self.health",
+      "def example(self): self.facing, self.position = self.position, self.facing",
+      "def example(self): self.health, self.facing = self.facing, self.health",
+      "def example(self): self.position, self.health = self.health, self.position",
+      "def example(self): self.position, self.facing = self.facing, self.position"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "\"moving httpresponse to view\"",
+    "code": "def restore(request):\n    user = User.from_django_user(request.user)\n    restore_id = request.GET.get('since')\n    return generate_restore_response(user, restore_id)\n    \n",
+    "perturbations": [
+      "def restore(request): ...",
+      "def restore(request): return generate_restore_response(user, '1')",
+      "def restore(request): return generate_restore_response('wrong_user', request.GET.get('since'))",
+      "def restore(request): user = User.from_django_user(request.user); restore_id = request.GET.get('since'); return generate_restore_response(user, 1)",
+      "def restore(request): user = User.from_django_user(request.user); restore_id = 'wrong_id'; return generate_restore_response(user, restore_id)"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Adjust code to restore generality.",
+    "code": "def sin_theta_sum(variables):\r\n    theta = 0\r\n    for var in variables:\r\n        theta += var\r\n    return np.sin(theta)\r\n\r\n\r",
+    "perturbations": [
+      "def sin_theta_sum(variables):\n    theta = 0\n    for var in variables:\n        theta -= var\n    return np.sin(theta)",
+      "def sin_theta_sum(variables):\n    theta = 0\n    for var in variables:\n        if var == 'a':\n            theta += var\n    return np.sin(theta)",
+      "def sin_theta_sum(variables):\n    theta = 0\n    for var in variables:\n        theta = var\n    return np.sin(theta)",
+      "def sin_theta_sum(variables):\n    theta = 1\n    for var in variables:\n        if var == 'a':\n            theta += var\n    return np.sin(theta)",
+      "def sin_theta_sum(variables):\n    theta = 0\n    for var in variables:\n        theta = var + 1\n    return np.sin(theta)"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Correct the unit test in V5_5_0",
+    "code": "class TestPluginUtilsV550(base_plugin_utils_test.TestPluginUtilsHigherThanV5):\n\n    def setUp(self):\n        super(TestPluginUtilsV550, self).setUp()\n        self.plug_utils = pu.PluginUtilsV550()\n        self.version = \"v5_5_0\"",
+    "perturbations": [
+      "def example(): self.plug_utils = pu.PluginUtilsV549()",
+      "def example(): return self.plug_utils.compare_versions(self.version, 'v5_5_1') > 0",
+      "def example(): self.plug_utils = pu.PluginUtilsV551()",
+      "def example(): return self.plug_utils.compare_versions(self.version, 'v5_4_9') < 0",
+      "def example(): self.plug_utils = pu.PluginUtilsV548()"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Return a text attribute for an hover only module",
+    "code": "def handler(q=False):\n    if q is False:\n        return False\n    print (q)\n    request = json.loads(q)\n    if not request.get('vulnerability'):\n        misperrors['error'] = 'Vulnerability id missing'\n        return misperrors\n\n    r = requests.get(cveapi_url+request.get('vulnerability'))\n    if r.status_code == 200:\n        vulnerability = json.loads(r.text)\n        if vulnerability.get('summary'):\n            summary = vulnerability['summary']\n    else:\n        misperrors['error'] = 'cve.circl.lu API not accessible'\n        return misperrors['error']\n\n    r = {'results': [{'types': mispattributes['output'], 'values': summary}]}\n    return r\n\n",
+    "perturbations": [
+      "def handler(q=False):\n    if q is False:\n        return [False]\n    print (q)\n    request = json.loads(q)\n    if not request.get('vulnerability'):\n        misperrors['error'] = 'Vulnerability id missing'\n        return misperrors\n\n    r = requests.get(cveapi_url+request.get('vulnerability'))\n    if r.status_code == 200:\n        vulnerability = json.loads(r.text)\n        if vulnerability.get('summary'):\n            summary = vulnerability['summary']\n    else:\n        misperrors['error'] = 'cve.circl.lu API not accessible'\n        return misperrors\n\n    r = {'results': [{'types': mispattributes['output'], 'values': summary}]}]\n    return r",
+      "def handler(q=False):\n    if q is False:\n        return [False]\n    print (q)\n    request = json.loads(q)\n    if not request.get('vulnerability'):\n        misperrors['error'] = 'Vulnerability id missing'\n        return misperrors\n\n    r = requests.get(cveapi_url+request.get('vulnerability'))\n    if r.status_code == 200:\n        vulnerability = json.loads(r.text)\n        if vulnerability.get('summary'):\n            summary = vulnerability['summary']\n    else:\n        misperrors['error'] = 'cve.circl.lu API not accessible'\n        return misperrors\n\n    r = [{'results': [{'types': mispattributes['output'], 'values': summary}]}]\n    return r",
+      "def handler(q=False):\n    if q is False:\n        return [False]\n    print (q)\n    request = json.loads(q)\n    if not request.get('vulnerability'):\n        misperrors['error'] = 'Vulnerability id missing'\n        return misperrors\n\n    r = requests.get(cveapi_url+request.get('vulnerability'))\n    if r.status_code == 200:\n        vulnerability = json.loads(r.text)\n        if vulnerability.get('summary'):\n            summary = vulnerability['summary']\n    else:\n        misperrors['error'] = 'cve.circl.lu API not accessible'\n        return misperrors\n\n    r = {'results': [{'types': mispattributes['output'], 'values': summary}]}]\n    return r",
+      "def handler(q=False):\n    if q is False:\n        return [False]\n    print (q)\n    request = json.loads(q)\n    if not request.get('vulnerability'):\n        misperrors['error'] = 'Vulnerability id missing'\n        return misperrors\n\n    r = requests.get(cveapi_url+request.get('vulnerability'))\n    if r.status_code == 200:\n        vulnerability = json.loads(r.text)\n        if vulnerability.get('summary'):\n            summary = vulnerability['summary']\n    else:\n        misperrors['error'] = 'cve.circl.lu API not accessible'\n        return misperrors\n\n    r = {'results': [{'types': mispattributes['output'], 'values': summary}]}]\n    return r",
+      "def handler(q=False):\n    if q is False:\n        return [False]\n    print (q)\n    request = json.loads(q)\n    if not request.get('vulnerability'):\n        misperrors['error'] = 'Vulnerability id missing'\n        return misperrors\n\n    r = requests.get(cveapi_url+request.get('vulnerability'))\n    if r.status_code == 200:\n        vulnerability = json.loads(r.text)\n        if vulnerability.get('summary'):\n            summary = vulnerability['summary']\n    else:\n        misperrors['error'] = 'cve.circl.lu API not accessible'\n        return misperrors\n\n    r = {'results': [{'types': mispattributes['output'], 'values': summary}]}]\n    return r"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "To catch up with Sublime-Linter API",
+    "code": "class PugLint(NodeLinter):\n    \"\"\"Provides an interface to pug-lint.\"\"\"\n\n    cmd = 'pug-lint ${temp_file} ${args}'\n    regex = r'^.+?:(?P<line>\\d+)(:(?P<col>\\d+) | )(?P<message>.+)'\n    multiline = False\n    tempfile_suffix = 'pug'\n    error_stream = util.STREAM_BOTH\n    defaults = {\n        'selector': 'text.pug, source.pypug, text.jade',\n        '--reporter=': 'inline'\n    }\n    default_type = WARNING",
+    "perturbations": [
+      "def PugLint(self): ...",
+      "def cmd(self): ...",
+      "def regex(self): ...",
+      "def multiline(self): ...",
+      "def tempfile_suffix(self): ..."
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Indention error - thought that was fixed before my last push",
+    "code": "def _eintr_retry_call(func, *args):\n\twhile True:\n\t\ttry:\n\t\t\treturn func(*args)\n\t\texcept OSError, e:\n\t\t\tif e.errno == errno.EINTR:\n\t\t\t\tcontinue\n\t\t\traise\n",
+    "perturbations": [
+      "def _eintr_retry_call(func, *args): while True: try: return func(*args) except OSError, e: if e.errno == errno.EINTR: continue raise",
+      "def _eintr_retry_call(func, *args): while True: try: return func(*args) except OSError as e: if e.errno == errno.EINTR: continue raise",
+      "def _eintr_retry_call(func, *args): while True: try: return func(*args) except OSError, e: if e.errno != errno.EINTR: raise",
+      "def _eintr_retry_call(func, *args): while True: try: return func(*args) except Exception as e: if e.errno == errno.EINTR: continue raise",
+      "def _eintr_retry_call(func, *args): while True: try: return func(*args) except OSError, e: if e.errno == -errno.EINTR: continue raise"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Expected count again after changes",
+    "code": "def test_processor():\n    tp = process_from_web(affinity_class_limit=10)\n    assert tp\n    assert tp.statements\n    num_stmts = len(tp.statements)\n    # This is the total number of statements about human genes\n    assert num_stmts == 1168706, num_stmts\n    assert all(len(s.evidence) >= 1 for s in tp.statements), \\\n        'Some statements lack any evidence'",
+    "perturbations": [
+      "def test_processor(): tp = process_from_web(affinity_class_limit=10); assert tp; assert tp.statements; num_stmts = len(tp.statements); assert num_stmts == 1168707, num_stmts;",
+      "def test_processor(): tp = process_from_web(affinity_class_limit=10); assert tp; assert tp.statements; num_stmts = len(tp.statements); assert num_stmts == 1168705, num_stmts;",
+      "def test_processor(): tp = process_from_web(affinity_class_limit=10); assert tp; assert tp.statements; num_stmts = len(tp.statements); assert num_stmts == 1168704, num_stmts;",
+      "def test_processor(): tp = process_from_web(affinity_class_limit=10); assert tp; assert tp.statements; num_stmts = len(tp.statements); assert num_stmts == 1168703, num_stmts;",
+      "def test_processor(): tp = process_from_web(affinity_class_limit=10); assert tp; assert tp.statements; num_stmts = len(tp.statements); assert num_stmts == 1168702, num_stmts;"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Move object creation outside of get method",
+    "code": "class ApiBase(object):\n    def __init__(self, api_key, product, version='v1', entity=None):\n        self.product = product\n        self.version = version\n        self.entity = entity\n\n        self.api_url = 'https://api.laposte.fr/%(product)s/%(version)s/' % {\n                'product': self.product,\n                'version': self.version}\n\n        self.headers = {'X-Okapi-Key': api_key}\n\n    def get(self, resource, params={}):\n        response = self._get(resource, params)\n        if self.entity is None:\n            return response\n\n        return self.create_object(response, self.entity)\n\n    def _get(self, resource, params={}):\n        r = requests.get(self.api_url + resource, params=params, headers=self.headers)\n        return r.json()\n\n    def create_object(self, response, entity):\n        module = import_module('lapostesdk.entities')\n        obj = getattr(module, self.entity)\n        instance = obj()\n        instance.hydrate(response)\n        return instance",
+    "perturbations": [
+      "def get(self, resource, params={}): return self._get(resource)",
+      "def _get(self, resource, params={}): return requests.get('http://invalid-url.com')",
+      "def create_object(self, response, entity): obj = getattr(module, 'INVALID_ENTITY'); instance = obj(); instance.hydrate(response); return instance",
+      "def get(self, resource, params={}): return self._get(resource, params)",
+      "def _get(self, resource, params={}): return requests.get('https://api.laposte.fr/%(product)s/invalid-version/' % {'product': self.product})"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Use score as well in annotations table",
+    "code": "def main(args):\n    rpkm_table =pd.read_table(args.rpkm_table, index_col=0)\n    annotations = pd.read_table(args.annotation_table, header=None, names=[\"gene_id\", \"annotation\", \"evalue\", \"score\"])\n\n    annotation_rpkm = {}\n    for annotation, annotation_df in annotations.groupby('annotation'):\n        annotation_rpkm[annotation] = rpkm_table.ix[annotation_df.gene_id].sum()\n\n    annotation_rpkm_df = pd.DataFrame.from_dict(annotation_rpkm, orient='index')\n    # sort the columns of the dataframe\n    annotation_rpkm_df = annotation_rpkm_df.reindex(columns=sorted(rpkm_table.columns))\n    annotation_rpkm_df.to_csv(sys.stdout, sep='\\t')\n",
+    "perturbations": [
+      "def main(args):\n    rpkm_table = pd.read_table(args.rpkm_table, index_col=0)\n    annotations = pd.read_table(args.annotation_table, header=None, names=['gene_id', 'annotation', 'evalue'])\n\n    annotation_rpkm = {}\n    for annotation, annotation_df in annotations.groupby('annotation'):\n        annotation_rpkm[annotation] = rpkm_table.ix[annotation_df.gene_id].sum()\n\n    annotation_rpkm_df = pd.DataFrame.from_dict(annotation_rpkm, orient='index')\n    # sort the columns of the dataframe incorrectly\n    annotation_rpkm_df = annotation_rpkm_df.reindex(columns=sorted(rpkm_table.columns))[::-1]\n    annotation_rpkm_df.to_csv(sys.stdout, sep='\t')",
+      "def main(args):\n    rpkm_table = pd.read_table(args.rpkm_table, index_col=0)\n    annotations = pd.read_table(args.annotation_table, header=None, names=['gene_id', 'annotation', 'evalue'])\n\n    annotation_rpkm = {}\n    for annotation, annotation_df in annotations.groupby('annotation'):\n        annotation_rpkm[annotation] = rpkm_table.ix[annotation_df.gene_id].sum()\n\n    annotation_rpkm_df = pd.DataFrame.from_dict(annotation_rpkm, orient='index')\n    # sort the columns of the dataframe incorrectly (reversed order)\n    annotation_rpkm_df = annotation_rpkm_df.reindex(columns=sorted(rpkm_table.columns)[::-1])\n    annotation_rpkm_df.to_csv(sys.stdout, sep='\t')",
+      "def main(args):\n    rpkm_table = pd.read_table(args.rpkm_table, index_col=0)\n    annotations = pd.read_table(args.annotation_table, header=None, names=['gene_id', 'annotation', 'evalue'])\n\n    annotation_rpkm = {}\n    for annotation, annotation_df in annotations.groupby('annotation'):\n        annotation_rpkm[annotation] = rpkm_table.ix[annotation_df.gene_id].sum()\n\n    annotation_rpkm_df = pd.DataFrame.from_dict(annotation_rpkm, orient='index')\n    # sort the columns of the dataframe incorrectly (missing one column)\n    annotation_rpkm_df = annotation_rpkm_df.reindex(columns=sorted(rpkm_table.columns)[:-1])\n    annotation_rpkm_df.to_csv(sys.stdout, sep='\t')",
+      "def main(args):\n    rpkm_table = pd.read_table(args.rpkm_table, index_col=0)\n    annotations = pd.read_table(args.annotation_table, header=None, names=['gene_id', 'annotation', 'evalue'])\n\n    annotation_rpkm = {}\n    for annotation, annotation_df in annotations.groupby('annotation'):\n        annotation_rpkm[annotation] = rpkm_table.ix[annotation_df.gene_id].sum()\n\n    annotation_rpkm_df = pd.DataFrame.from_dict(annotation_rpkm, orient='index')\n    # sort the columns of the dataframe incorrectly (wrong order)\n    annotation_rpkm_df = annotation_rpkm_df.reindex(columns=sorted(rpkm_table.columns)[1:])\n    annotation_rpkm_df.to_csv(sys.stdout, sep='\t')",
+      "def main(args):\n    rpkm_table = pd.read_table(args.rpkm_table, index_col=0)\n    annotations = pd.read_table(args.annotation_table, header=None, names=['gene_id', 'annotation', 'evalue'])\n\n    annotation_rpkm = {}\n    for annotation, annotation_df in annotations.groupby('annotation'):\n        annotation_rpkm[annotation] = rpkm_table.ix[annotation_df.gene_id].sum()\n\n    annotation_rpkm_df = pd.DataFrame.from_dict(annotation_rpkm, orient='index')\n    # sort the columns of the dataframe incorrectly (missing column name)\n    annotation_rpkm_df = annotation_rpkm_df.reindex(columns=sorted(rpkm_table.columns)[0])\n    annotation_rpkm_df.to_csv(sys.stdout, sep='\t')"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Code which blanks patch files",
+    "code": "def ApplyPatches(filein, fileout):\n        # Generate short name such as wrans/answers2003-03-31.html\n        (rest, name) = os.path.split(filein)\n        (rest, dir) = os.path.split(rest)\n        fileshort = os.path.join(dir, name)\n\n        # Look for a patch file from our collection (which is\n        # in the pyscraper/patches folder in Public Whip CVS)\n        patchfile = os.path.join(\"patches\", fileshort + \".patch\")\n        if not os.path.isfile(patchfile):\n                return False\n\n        while True:\n                # Apply the patch\n                shutil.copyfile(filein, fileout)\n\n                # delete temporary file that might have been created by a previous patch failure \n                filoutorg = fileout + \".orig\"\n                if os.path.isfile(filoutorg):\n                    os.remove(filoutorg)\n                status = os.system(\"patch --quiet %s <%s\" % (fileout, patchfile))\n\n                if status == 0:\n                        return True\n\n                raise Exception, \"Error running 'patch' on file %s\" % fileshort\n\n                #print \"blanking out %s\" % fileshort\n                #os.rename(patchfile, patchfile + \".old~\")\n                #blankfile = open(patchfile, \"w\")\n                #blankfile.close()",
+    "perturbations": [
+      "def ApplyPatches(filein, fileout):\n        (rest, name) = os.path.split(filein)\n        (rest, dir) = os.path.split(rest)\n        fileshort = os.path.join(dir, name)\n\n        # Look for a patch file from our collection (which is\n        # in the pyscraper/patches folder in Public Whip CVS)\n        patchfile = os.path.join('patches', fileshort + '.patch')\n        if not os.path.isfile(patchfile):\n                return False\n\n        while True:\n                # Apply the patch\n                shutil.copyfile(filein, fileout)\n\n                # delete temporary file that might have been created by a previous patch failure \n                filoutorg = fileout + '.orig'\n                if os.path.isfile(filoutorg):\n                    os.remove(filoutorg)\n                status = os.system('patch --quiet %s <%s' % (fileout, patchfile + '.old~'))\n\n                if status == 0:\n                        return True\n\n                raise Exception, 'Error running 'patch' on file %s' % fileshort\n\n                #print \"blanking out %s\" % fileshort\n                #os.rename(patchfile, patchfile + '.old~')\n                #blankfile = open(patchfile, \"w\")\n                #blankfile.close()",
+      "def ApplyPatches(filein, fileout):\n        (rest, name) = os.path.split(filein)\n        (rest, dir) = os.path.split(rest)\n        fileshort = os.path.join(dir, name)\n\n        # Look for a patch file from our collection (which is\n        # in the pyscraper/patches folder in Public Whip CVS)\n        patchfile = os.path.join('patches', fileshort + '.patch')\n        if not os.path.isfile(patchfile):\n                return False\n\n        while True:\n                # Apply the patch\n                shutil.copyfile(filein, fileout)\n\n                # delete temporary file that might have been created by a previous patch failure \n                filoutorg = fileout + '.orig'\n                if os.path.isfile(filoutorg):\n                    os.remove(filoutorg)\n                status = os.system('patch --quiet %s <%s' % (fileout, patchfile + 'other_patch.patch'))\n\n                if status == 0:\n                        return True\n\n                raise Exception, 'Error running 'patch' on file %s' % fileshort\n\n                #print \"blanking out %s\" % fileshort\n                #os.rename(patchfile, patchfile + '.old~')\n                #blankfile = open(patchfile, \"w\")\n                #blankfile.close()",
+      "def ApplyPatches(filein, fileout):\n        (rest, name) = os.path.split(filein)\n        (rest, dir) = os.path.split(rest)\n        fileshort = os.path.join(dir, name)\n\n        # Look for a patch file from our collection (which is\n        # in the pyscraper/patches folder in Public Whip CVS)\n        patchfile = os.path.join('patches', fileshort + '.patch')\n        if not os.path.isfile(patchfile):\n                return False\n\n        while True:\n                # Apply the patch\n                shutil.copyfile(filein, fileout)\n\n                # delete temporary file that might have been created by a previous patch failure \n                filoutorg = fileout + '.orig'\n                if os.path.isfile(filoutorg):\n                    os.remove(filoutorg)\n                status = os.system('patch --quiet %s <%s' % (fileout, patchfile[:10]))\n\n                if status == 0:\n                        return True\n\n                raise Exception, 'Error running 'patch' on file %s' % fileshort\n\n                #print \"blanking out %s\" % fileshort\n                #os.rename(patchfile, patchfile + '.old~')\n                #blankfile = open(patchfile, \"w\")\n                #blankfile.close()",
+      "def ApplyPatches(filein, fileout):\n        (rest, name) = os.path.split(filein)\n        (rest, dir) = os.path.split(rest)\n        fileshort = os.path.join(dir, name)\n\n        # Look for a patch file from our collection (which is\n        # in the pyscraper/patches folder in Public Whip CVS)\n        patchfile = os.path.join('patches', fileshort + '.patch')\n        if not os.path.isfile(patchfile):\n                return False\n\n        while True:\n                # Apply the patch\n                shutil.copyfile(filein, fileout)\n\n                # delete temporary file that might have been created by a previous patch failure \n                filoutorg = fileout + '.orig'\n                if os.path.isfile(filoutorg):\n                    os.remove(filoutorg)\n                status = os.system('patch --quiet %s <%s' % (fileout, patchfile[:-10]))\n\n                if status == 0:\n                        return True\n\n                raise Exception, 'Error running 'patch' on file %s' % fileshort\n\n                #print \"blanking out %s\" % fileshort\n                #os.rename(patchfile, patchfile + '.old~')\n                #blankfile = open(patchfile, \"w\")\n                #blankfile.close()",
+      "def ApplyPatches(filein, fileout):\n        (rest, name) = os.path.split(filein)\n        (rest, dir) = os.path.split(rest)\n        fileshort = os.path.join(dir, name)\n\n        # Look for a patch file from our collection (which is\n        # in the pyscraper/patches folder in Public Whip CVS)\n        patchfile = os.path.join('patches', fileshort + '.patch')\n        if not os.path.isfile(patchfile):\n                return False\n\n        while True:\n                # Apply the patch\n                shutil.copyfile(filein, fileout)\n\n                # delete temporary file that might have been created by a previous patch failure \n                filoutorg = fileout + '.orig'\n                if os.path.isfile(filoutorg):\n                    os.remove(filoutorg)\n                status = os.system('patch --quiet %s <%s' % (fileout, patchfile[:-10] + 'other_patch.patch'))\n\n                if status == 0:\n                        return True\n\n                raise Exception, 'Error running 'patch' on file %s' % fileshort\n\n                #print \"blanking out %s\" % fileshort\n                #os.rename(patchfile, patchfile + '.old~')\n                #blankfile = open(patchfile, \"w\")\n                #blankfile.close()"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Allow the ingester to work without a report key",
+    "code": "class SNSReporter(object):\n    '''report ingestion events to SNS'''\n\n    def __init__(self, report_key):\n        self.report_key = report_key\n        self.logger = logging.getLogger(self._log_name)\n\n    @classmethod\n    def from_config(cls):\n        report_key = os.environ.get('DATALAKE_REPORT_KEY')\n        if report_key is None:\n            return None\n        return cls(report_key)\n\n    @property\n    def _log_name(self):\n        return self.report_key.split(':')[-1]\n\n    @memoized_property\n    def _connection(self):\n        region = os.environ.get('AWS_REGION')\n        if region:\n            return boto.sns.connect_to_region(region)\n        else:\n            return boto.connect_sns()\n\n    def report(self, ingestion_report):\n        message = json.dumps(ingestion_report)\n        self.logger.info('REPORTING: %s', message)\n        self._connection.publish(topic=self.report_key, message=message)",
+    "perturbations": [
+      "def SNSReporter(report_key):\n    self.report_key = report_key\n    self.logger = logging.getLogger(self._log_name)\n\n    @classmethod\n    def from_config(cls):\n        report_key = os.environ.get('DATALAKE_REPORT_KEY')\n        if not report_key:\n            return None\n        return cls(report_key)\n\n    @property\n    def _log_name(self):\n        return self.report_key.split(':')[-1]\n\n    @memoized_property\n    def _connection(self):\n        region = os.environ.get('AWS_REGION')\n        if not region:\n            return boto.connect_sns()\n        else:\n            return boto.sns.connect_to_region(region)\n\n    def report(self, ingestion_report):\n        message = json.dumps(ingestion_report)\n        self.logger.info('REPORTING: %s', message)\n        self._connection.publish(topic=self.report_key, message=message)",
+      "def SNSReporter(report_key):\n    self.report_key = report_key\n    self.logger = logging.getLogger(self._log_name)\n\n    @classmethod\n    def from_config(cls):\n        report_key = os.environ.get('DATALAKE_REPORT_KEY')\n        if not report_key:\n            return None\n        return cls(report_key)\n\n    @property\n    def _log_name(self):\n        return self.report_key.split(':')[-1]\n\n    @memoized_property\n    def _connection(self):\n        region = os.environ.get('AWS_REGION')\n        if not region:\n            return boto.connect_sns()\n        else:\n            return boto.sns.connect_to_region(region)\n\n    def report(self, ingestion_report):\n        message = json.dumps(ingestion_report)\n        self.logger.info('REPORTING: %s', message)\n        self._connection.publish(topic=self.report_key, message=message)",
+      "def SNSReporter(report_key):\n    self.report_key = report_key\n    self.logger = logging.getLogger(self._log_name)\n\n    @classmethod\n    def from_config(cls):\n        report_key = os.environ.get('DATALAKE_REPORT_KEY')\n        if not report_key:\n            return None\n        return cls(report_key)\n\n    @property\n    def _log_name(self):\n        return self.report_key.split(':')[-1]\n\n    @memoized_property\n    def _connection(self):\n        region = os.environ.get('AWS_REGION')\n        if not region:\n            return boto.connect_sns()\n        else:\n            return boto.sns.connect_to_region(region)\n\n    def report(self, ingestion_report):\n        message = json.dumps(ingestion_report)\n        self.logger.info('REPORTING: %s', message)\n        self._connection.publish(topic=self.report_key, message=message)",
+      "def SNSReporter(report_key):\n    self.report_key = report_key\n    self.logger = logging.getLogger(self._log_name)\n\n    @classmethod\n    def from_config(cls):\n        report_key = os.environ.get('DATALAKE_REPORT_KEY')\n        if not report_key:\n            return None\n        return cls(report_key)\n\n    @property\n    def _log_name(self):\n        return self.report_key.split(':')[-1]\n\n    @memoized_property\n    def _connection(self):\n        region = os.environ.get('AWS_REGION')\n        if not region:\n            return boto.connect_sns()\n        else:\n            return boto.sns.connect_to_region(region)\n\n    def report(self, ingestion_report):\n        message = json.dumps(ingestion_report)\n        self.logger.info('REPORTING: %s', message)\n        self._connection.publish(topic=self.report_key, message=message)",
+      "def SNSReporter(report_key):\n    self.report_key = report_key\n    self.logger = logging.getLogger(self._log_name)\n\n    @classmethod\n    def from_config(cls):\n        report_key = os.environ.get('DATALAKE_REPORT_KEY')\n        if not report_key:\n            return None\n        return cls(report_key)\n\n    @property\n    def _log_name(self):\n        return self.report_key.split(':')[-1]\n\n    @memoized_property\n    def _connection(self):\n        region = os.environ.get('AWS_REGION')\n        if not region:\n            return boto.connect_sns()\n        else:\n            return boto.sns.connect_to_region(region)\n\n    def report(self, ingestion_report):\n        message = json.dumps(ingestion_report)\n        self.logger.info('REPORTING: %s', message)\n        self._connection.publish(topic=self.report_key, message=message)"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Talk model __str__ to include time",
+    "code": "class Event(models.Model):\n    name = models.CharField(max_length=1024, unique=True)\n    slug = models.SlugField(max_length=1024)\n    \n    def __str__(self):\n        return self.name\n    ",
+    "perturbations": [
+      "def example(): return self.name[1:]",
+      "def example(): return self.name + ' ' + str(self.id)",
+      "def example(): return self.name * 2",
+      "def example(): return self.name.split()[0]",
+      "def example(): return self.name.replace('a', 'e')"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Safety checks in test",
+    "code": "class CupyTestMemoryHook(cupy.cuda.memory_hook.MemoryHook):\n\n    name = 'CupyTestMemoryHook'\n\n    def __init__(self):\n        self.used_bytes = 0\n        self.acquired_bytes = 0\n\n    def alloc_preprocess(self, **kwargs):\n        self.acquired_bytes += kwargs['mem_size']\n\n    def malloc_preprocess(self, **kwargs):\n        self.used_bytes += kwargs['mem_size']\n\n",
+    "perturbations": [
+      "def example(self): self.used_bytes -= kwargs['mem_size']",
+      "def example(self): self.acquired_bytes = 0",
+      "def example(self): self.used_bytes = '1'",
+      "def example(self, **kwargs): self.acquired_bytes += '2'",
+      "def example(self, **kwargs): self.used_bytes += int('3')"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Todo for future work",
+    "code": "def getAllMovies():\n  # TODO: determine all/unwatched/watched from settings...\n  # rpccmd = {'jsonrpc': '2.0', 'method': 'VideoLibrary.GetMovies', 'params': { 'filter': { 'field': 'playcount', 'operator': 'lessthan', 'value': '1' }, 'properties': [ 'file' ] }, 'id': 'libMovies'}\n  rpccmd = {'jsonrpc': '2.0', 'method': 'VideoLibrary.GetMovies', 'params': { 'properties': [ 'file' ] }, 'id': 'libMovies'}\n  rpccmd = json.dumps(rpccmd)\n  result = xbmc.executeJSONRPC(rpccmd)\n  result = json.loads(result)\n  return result\n",
+    "perturbations": [
+      "def getAllMovies(): rpccmd = {'jsonrpc': '2.0', 'method': 'VideoLibrary.GetMovies', 'params': { 'filter': { 'field': 'playcount', 'operator': 'greaterthan', 'value': '1' }, 'properties': [ 'file' ] }, 'id': 'libMovies'}",
+      "def getAllMovies(): rpccmd = {'jsonrpc': '2.0', 'method': 'VideoLibrary.GetMovies', 'params': { 'filter': { 'field': 'playcount', 'operator': '<=', 'value': '1' }, 'properties': [ 'file' ] }, 'id': 'libMovies'}",
+      "def getAllMovies(): rpccmd = {'jsonrpc': '2.0', 'method': 'VideoLibrary.GetMovies', 'params': { 'filter': { 'field': 'playcount', 'operator': '=', 'value': '1' }, 'properties': [ 'file' ] }, 'id': 'libMovies'}",
+      "def getAllMovies(): rpccmd = {'jsonrpc': '2.0', 'method': 'VideoLibrary.GetMovies', 'params': { 'filter': { 'field': 'playcount', 'operator': '>', 'value': '1' }, 'properties': [ 'file' ] }, 'id': 'libMovies'}",
+      "def getAllMovies(): rpccmd = {'jsonrpc': '2.0', 'method': 'VideoLibrary.GetMovies', 'params': { 'filter': { 'field': 'playcount', 'operator': '<', 'value': '1' }, 'properties': [ 'file' ] }, 'id': 'libMovies'}"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Unused attributes; also, empty responses after it's flushed.",
+    "code": "class Message(object):\n    def __init__(self, backend, caller=None, text=None):\n        self._backend = backend\n        self.caller = caller\n        self.text = text\n        self.responses = []\n    \n    def __unicode__(self):\n        return self.text\n\n    @property\n    def backend(self):\n        # backend is read-only, since it's an\n        # immutable property of this object\n        return self._backend\n    \n    def send(self):\n        \"\"\"Send this message via self.backend, returning\n           True if the message was sent successfully.\"\"\"\n        return self.backend.router.outgoing(self)\n\n    def flush_responses (self):\n        for response in self.responses:\n            response.send()\n            self.responses.remove(response)\n\n    def respond(self, text):\n        \"\"\"Send the given text back to the original caller of this\n           message on the same route that it came in on\"\"\"\n        if self.caller: \n            response = copy.copy(self)\n            response.text = text\n            self.responses.append(response)\n            return True\n        else: \n            return False",
+    "perturbations": [
+      "def Message(self): ...",
+      "def send(self): return self._backend.router.outgoing(self)",
+      "def flush_responses (self): for response in self.responses: response.send()",
+      "def respond(self, text): if self.caller: response = copy.copy(self); response.text = text; self.responses.append(response); return True else: return False",
+      "def __unicode__(self): return 'Hello World'"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Input check when getting all nodes.",
+    "code": "class SwitchManager(object):\n    def extract_all_nodes(self, content):\n        \"\"\"\n        Return all nodes.\n        \"\"\"\n        if isinstance(content,dict) or not content.has_key('nodeProperties'):\n            return None\n        else:\n            return [e.get('node') for e in content['nodeProperties']]\n\n    def extract_all_properties(self, content):\n        pass",
+    "perturbations": [
+      "def extract_all_nodes(self, content):\n    if isinstance(content,dict) or not hasattr(content,'nodeProperties'):\n        return None\n    else:\n        return [e.get('node') for e in content['nodeProperties']]",
+      "def extract_all_properties(self, content):\n    pass",
+      "def extract_all_nodes(self, content):\n    if isinstance(content,list) or not content.has_key('nodeProperties'):\n        return None\n    else:\n        return [e.get('node') for e in content['nodeProperties']]",
+      "def extract_all_properties(self, content):\n    pass",
+      "def extract_all_nodes(self, content):\n    if isinstance(content,dict) or not content.has_key('nodeProperties'):\n        return None\n    else:\n        return [e.get('node') for e in content['nodeProperties']]"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Improve commenting on main function",
+    "code": "def get_arguments():\n    \"\"\"Set up the argument parser and return an object storing the\n    argument values.\n\n    return - An object storing argument values, as returned by\n    argparse.parse_args()\n\n    \"\"\"\n\n    parser = argparse.ArgumentParser(description=\"Compile C files.\")\n\n    # The file name of the C file to compile. The file name gets saved to the\n    # file_name attribute of the returned object, but this parameter appears as\n    # \"filename\" (no underscore) on the command line.\n    parser.add_argument(\"file_name\", metavar=\"filename\")\n    return parser.parse_args()\n",
+    "perturbations": [
+      "def get_arguments():\n    parser = argparse.ArgumentParser(description=\"Compile C files.\")\n\n    parser.add_argument(\"file_name\", metavar=\"filename\")\n    return parser.parse_args()",
+      "def get_arguments():\n    parser = argparse.ArgumentParser(description=\"Compile C files.\")\n\n    parser.add_argument(\"file_name\", metavar=\"filename\")\n    return parser.parse_args()",
+      "def get_arguments():\n    parser = argparse.ArgumentParser(description=\"Compile C files.\")\n\n    parser.add_argument(\"file_name\", metavar=\"filename\")\n    return parser.parse_args()",
+      "def get_arguments():\n    parser = argparse.ArgumentParser(description=\"Compile C files.\")\n\n    parser.add_argument(\"file_name\", metavar=\"filename\")\n    return parser.parse_args()",
+      "def get_arguments():\n    parser = argparse.ArgumentParser(description=\"Compile C files.\")\n\n    parser.add_argument(\"file_name\", metavar=\"filename\")\n    return parser.parse_args()"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Hardcoded shipping modification in order PDF view",
+    "code": "def product_xls(request):\n    output = StringIO.StringIO()\n    workbook = plata.reporting.product.product_xls()\n    workbook.save(output)\n    response = HttpResponse(output.getvalue(), mimetype='application/vnd.ms-excel')\n    response['Content-Disposition'] = 'attachment; filename=products.xls'\n    return response\n\n",
+    "perturbations": [
+      "def product_xls(request):\n    output = StringIO.StringIO()\n    workbook = plata.reporting.product.product_xls() * 2\n    workbook.save(output)\n    response = HttpResponse(output.getvalue(), mimetype='application/vnd.ms-excel')\n    response['Content-Disposition'] = 'attachment; filename=products.xls'\n    return response",
+      "def product_xls(request):\n    output = StringIO.StringIO()\n    workbook = plata.reporting.product.product_xls()\n    workbook.save(output)\n    response = HttpResponse(output.getvalue(), mimetype='application/zip')\n    response['Content-Disposition'] = 'attachment; filename=products.xls'\n    return response",
+      "def product_xls(request):\n    output = StringIO.StringIO()\n    workbook = plata.reporting.product.product_xls()\n    workbook.save(output)\n    response = HttpResponse(output.getvalue(), mimetype='application/vnd.ms-excel')\n    response['Content-Disposition'] = 'attachment; filename=products.docx'\n    return response",
+      "def product_xls(request):\n    output = StringIO.StringIO()\n    workbook = plata.reporting.product.product_xls()\n    workbook.save(output)\n    response = HttpResponse(output.getvalue(), mimetype='application/vnd.ms-excel')\n    response['Content-Disposition'] = 'attachment; filename=products.txt'\n    return response",
+      "def product_xls(request):\n    output = StringIO.StringIO()\n    workbook = plata.reporting.product.product_xls() + 'hello world'\n    workbook.save(output)\n    response = HttpResponse(output.getvalue(), mimetype='application/vnd.ms-excel')\n    response['Content-Disposition'] = 'attachment; filename=products.xls'\n    return response"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Copy postactivate file to VIRTUALENV directory.",
+    "code": "def with_venv(*args):\n    \"\"\"\n    Runs the given command inside virtualenv.\n    \"\"\"\n    cmd = list(args)\n    cmd.insert(0, WITH_VENV)\n    return subprocess.call(cmd)\n\n",
+    "perturbations": [
+      "def with_venv(*args):\n    cmd = list(args)\n    cmd.insert(0, WITH_VENV)\n    subprocess.call(cmd)",
+      "def with_venv(*args):\n    cmd = list(args)\n    cmd.insert(-1, WITH_VENV)\n    subprocess.call(cmd)",
+      "def with_venv(*args):\n    cmd = list(args)\n    cmd[0] = WITH_VENV\n    subprocess.call(cmd)",
+      "def with_venv(*args):\n    cmd = list(args)\n    cmd.insert(1, WITH_VENV)\n    subprocess.call(cmd)",
+      "def with_venv(*args):\n    cmd = list(args)\n    cmd[0] = 'with_venv'\n    subprocess.call(cmd)"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Error when trying to start without user/pass",
+    "code": "def main(username, password, debug):\n    navigator = Leifur(username, password)\n    if debug:\n        try:\n            navigator.start()\n        except Exception:\n            traceback.print_exc()\n            logger.error(traceback.format_exc())\n        finally:\n            navigator.shutdown()\n            logger.debug('Finally, bye!')\n    else:\n        try:\n            navigator.start()\n        finally:\n            navigator.shutdown()\n            logger.debug('Finally, bye!')\n\n",
+    "perturbations": [
+      "def main(username, password, debug): ...",
+      "def main(username, password, debug): ...",
+      "def main(username, password, debug): ...",
+      "def main(username, password, debug): ...",
+      "def main(username, password, debug): ..."
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Mark get new test as needing to be last",
+    "code": "def test_check_vers_update(fixture_update_dir):\n    package=fixture_update_dir(\"0.0.1\")\n    launch = Launcher('',r'http://rlee287.github.io/pyautoupdate/testing/')\n    launch._get_new()\n    with open(os.path.abspath(\"downloads/blah.py\"), \"r\") as file_code:\n        file_text=file_code.read()\n    assert \"new version\" in file_text",
+    "perturbations": [
+      "def test_check_vers_update(fixture_update_dir): package = fixture_update_dir('0.1.1')",
+      "def test_check_vers_update(fixture_update_dir): package = fixture_update_dir('0.0.2')",
+      "def test_check_vers_update(fixture_update_dir): launch._get_new()",
+      "def test_check_vers_update(fixture_update_dir): with open(os.path.abspath('downloads/blah.py'), 'r') as file_code: file_text=file_code.read()",
+      "def test_check_vers_update(fixture_update_dir): assert 'new version' in file_text"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Indentation error from conversion to spaces",
+    "code": "class QuantityWidget(MultiWidget):\n\n    def get_choices(self, allowed_types=None):\n        allowed_types = allowed_types or dir(ureg)\n        return [(x, x) for x in allowed_types]\n        \n    def __init__(self, attrs=None, base_units=None, allowed_types=None):\n        choices = self.get_choices(allowed_types)\n        self.base_units = base_units\n        attrs = attrs or {}\n        attrs.setdefault('step', 'any')\n\n        widgets = (\n                    NumberInput(attrs=attrs),\n                    Select(attrs=attrs, choices=choices)\n                )\n\n        super(QuantityWidget, self).__init__(widgets, attrs)\n\n    def decompress(self, value):\n        non_decimal = re.compile(r'[^\\d.]+')\n        if value:\n            number_value = non_decimal.sub('', str(value))\n            return [number_value, self.base_units]\n        return [None, self.base_units]",
+    "perturbations": [
+      "def QuantityWidget(attrs=None, base_units=None, allowed_types=None):\n    allowed_types = allowed_types or dir(ureg)\n    return [(x, x) for x in allowed_types + ['invalid']]",
+      "def get_choices(self, allowed_types=None):\n    allowed_types = allowed_types or dir(ureg)\n    choices = [(x, x) for x in allowed_types] + [('invalid', 'invalid')]\n    return choices",
+      "def __init__(self, attrs=None, base_units=None, allowed_types=None):\n    choices = self.get_choices(['invalid'] + allowed_types)\n    self.base_units = base_units\n    attrs = attrs or {}\n    attrs.setdefault('step', 'any')\n\n    widgets = (\n                    NumberInput(attrs=attrs),\n                    Select(attrs=attrs, choices=choices)\n                )\n\n    super(QuantityWidget, self).__init__(widgets, attrs)",
+      "def decompress(self, value):\n    non_decimal = re.compile(r'[^\\d.]+')\n    if value:\n        number_value = non_decimal.sub('', str(value)) + 'invalid'\n        return [number_value, self.base_units]\n    return [None, self.base_units]",
+      "def get_choices(self, allowed_types=None):\n    allowed_types = allowed_types or dir(ureg)\n    choices = [(x, x) for x in allowed_types] + [('invalid', 'invalid')]\n    return choices\n\ndef __init__(self, attrs=None, base_units=None, allowed_types=None):\n    choices = self.get_choices(['invalid'] + allowed_types)\n    self.base_units = base_units\n    attrs = attrs or {}\n    attrs.setdefault('step', 'any')\n\n    widgets = (\n                    NumberInput(attrs=attrs),\n                    Select(attrs=attrs, choices=choices)\n                )"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Addition method to Terrain",
+    "code": "class Terrain(object):\n    \"\"\"Container for a randomly generated area of terrain.\n\n    Attributes:\n        width (int): Width of generated terrain.\n        length (int): Length of generated terrain.\n        height_map (list): Map of heights of terrain. Values range from 0 to 1.\n\n    \"\"\"\n\n    def __init__(self, width, length):\n        \"\"\"Initializer for Terrain.\n\n        Args:\n            width (int): Width of terrain.\n            length (int): Height of terrain.\n\n        \"\"\"\n        self.width = width\n        self.length = length\n        self.height_map = [[0 for _ in self.width]] * self.length\n\n    def __getitem__(self, item):\n        \"\"\"Get an item at x-y coordinates.\n\n        Args:\n            item (tuple): 2-tuple of x and y coordinates.\n\n        Returns:\n            float: Height of terrain at coordinates, between 0 and 1.\n\n        \"\"\"\n        return self.height_map[item[1]][item[0]]\n\n    def __setitem__(self, key, value):\n        \"\"\"Set the height of an item.\n\n        Args:\n            key (tuple): 2-tuple of x and y coordinates.\n            value (float): New height of map at x and y coordinates, between 0 and 1.\n\n        \"\"\"\n        self.height_map[key[1]][key[0]] = value\n\n    def __add__(self, other):\n        \"\"\"Add two terrains, height by height.\n\n        Args:\n            other (Terrain): Other terrain to add self to. Must have same dimensions as self.\n\n        Returns:\n            Terrain: Terrain of self and other added together.\n\n        \"\"\"\n        result = Terrain(self.width, self.length)\n        for i in range(self.width):\n            for j in range(self.length):\n                result[i, j] = self[i, j] + other[i, j]\n        return result",
+    "perturbations": [
+      "def Terrain(width, length): ...",
+      "def __getitem__(self, item): ...",
+      "def __setitem__(self, key, value): ...",
+      "def __add__(self, other): ...",
+      "def example(): result = self.width + self.height"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Change 'username' destination to the 'username' attribute instead of user, since that's what is used in the code.",
+    "code": "def parent_parser():\n    \"\"\"Create command line argument parser with common PostgreSQL options\n\n    :return: the created parser\n    \"\"\"\n    parser = ArgumentParser(add_help=False)\n    parser.add_argument('dbname', help='database name')\n    group = parser.add_argument_group('Connection options')\n    group.add_argument('-H', '--host', help=\"database server host or \"\n                        \"socket directory (default %(default)s)\")\n    group.add_argument('-p', '--port', type=int, help=\"database server port \"\n                        \"number (default %(default)s)\")\n    group.add_argument('-U', '--username', dest='username',\n                        help=\"database user name (default %(default)s)\")\n    group.add_argument('-W', '--password', action=\"store_true\",\n                        help=\"force password prompt\")\n    parser.add_argument('-o', '--output', type=FileType('w'),\n                        help=\"output file name (default stdout)\")\n    parser.add_argument('--version', action='version', version='%(prog)s 0.4')\n    return parser",
+    "perturbations": [
+      "def parent_parser():\n    parser = ArgumentParser(add_help=False)\n    parser.add_argument('dbname', help='database name')\n    group = parser.add_argument_group('Connection options')\n    group.add_argument('-H', '--host', help=\"database server host or socket directory (default %(default)s)\")\n    group.add_argument('-p', '--port', type=int, help=\"database server port number (default %(default)s)\")\n    group.add_argument('-U', '--username', dest='user', help=\"database user name (default %(default)s)\")\n    group.add_argument('-W', '--password', action=\"store_true\", help=\"force password prompt\")\n    parser.add_argument('-o', '--output', type=FileType('w'), help=\"output file name (default stdout)\")\n    parser.add_argument('--version', action='version', version='%(prog)s 0.4')\n    return parser",
+      "def parent_parser():\n    parser = ArgumentParser(add_help=False)\n    parser.add_argument('dbname', help='database name')\n    group = parser.add_argument_group('Connection options')\n    group.add_argument('-H', '--host', help=\"database server host or socket directory (default %(default)s)\")\n    group.add_argument('-p', '--port', type=int, help=\"database server port number (default %(default)s)\")\n    group.add_argument('-U', '--username', dest='user', help=\"database user name (default %(default)s)\")\n    group.add_argument('-W', '--password', action=\"store_true\", help=\"force password prompt\")\n    parser.add_argument('-o', '--output', type=FileType('w'), help=\"output file name (default stdout)\")\n    parser.add_argument('--version', action='version', version='%(prog)s 0.4')\n    return parser",
+      "def parent_parser():\n    parser = ArgumentParser(add_help=False)\n    parser.add_argument('dbname', help='database name')\n    group = parser.add_argument_group('Connection options')\n    group.add_argument('-H', '--host', help=\"database server host or socket directory (default %(default)s)\")\n    group.add_argument('-p', '--port', type=int, help=\"database server port number (default %(default)s)\")\n    group.add_argument('-U', '--username', dest='user', help=\"database user name (default %(default)s)\")\n    group.add_argument('-W', '--password', action=\"store_true\", help=\"force password prompt\")\n    parser.add_argument('-o', '--output', type=FileType('w'), help=\"output file name (default stdout)\")\n    parser.add_argument('--version', action='version', version='%(prog)s 0.4')\n    return parser",
+      "def parent_parser():\n    parser = ArgumentParser(add_help=False)\n    parser.add_argument('dbname', help='database name')\n    group = parser.add_argument_group('Connection options')\n    group.add_argument('-H', '--host', help=\"database server host or socket directory (default %(default)s)\")\n    group.add_argument('-p', '--port', type=int, help=\"database server port number (default %(default)s)\")\n    group.add_argument('-U', '--username', dest='user', help=\"database user name (default %(default)s)\")\n    group.add_argument('-W', '--password', action=\"store_true\", help=\"force password prompt\")\n    parser.add_argument('-o', '--output', type=FileType('w'), help=\"output file name (default stdout)\")\n    parser.add_argument('--version', action='version', version='%(prog)s 0.4')\n    return parser",
+      "def parent_parser():\n    parser = ArgumentParser(add_help=False)\n    parser.add_argument('dbname', help='database name')\n    group = parser.add_argument_group('Connection options')\n    group.add_argument('-H', '--host', help=\"database server host or socket directory (default %(default)s)\")\n    group.add_argument('-p', '--port', type=int, help=\"database server port number (default %(default)s)\")\n    group.add_argument('-U', '--username', dest='user', help=\"database user name (default %(default)s)\")\n    group.add_argument('-W', '--password', action=\"store_true\", help=\"force password prompt\")\n    parser.add_argument('-o', '--output', type=FileType('w'), help=\"output file name (default stdout)\")\n    parser.add_argument('--version', action='version', version='%(prog)s 0.4')\n    return parser"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Support to specify the valid external network name",
+    "code": "def get_ext_net_name(os_creds):\n    \"\"\"\n    Returns the configured external network name or\n    the first retrieved external network name\n    :param: os_creds: an instance of snaps OSCreds object\n    :return:\n    \"\"\"\n    neutron = neutron_utils.neutron_client(os_creds)\n    ext_nets = neutron_utils.get_external_networks(neutron)\n    if (hasattr(CONST, 'EXTERNAL_NETWORK')):\n        extnet_config = CONST.__getattribute__('EXTERNAL_NETWORK')\n        for ext_net in ext_nets:\n            if ext_net.name == extnet_config:\n                return extnet_config\n    return ext_nets[0].name if ext_nets else \"\"\n\n",
+    "perturbations": [
+      "def get_ext_net_name(os_creds): return os_creds['external_network']",
+      "def get_ext_net_name(os_creds): return ext_nets[0].name if not ext_nets else ''",
+      "def get_ext_net_name(os_creds): for ext_net in ext_nets: return ext_net.name if ext_net.name == 'invalid_config' else extnets[0].name",
+      "def get_ext_net_name(os_creds): if hasattr(CONST, 'EXTERNAL_NETWORK'): return CONST.__getattribute__('EXTERNAL_NETWORK') else 'default_network'",
+      "def get_ext_net_name(os_creds): neutron_utils.neutron_client = lambda x: 'invalid_neutron_client'"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Test for connecting containment to package and a class [skip ci]\n\nSigned-off-by: Dan Yeaw <2591e5f46f28d303f9dc027d475a5c60d8dea17a@yeaw.me>",
+    "code": "def test_containment_package_glue(create):\n    \"\"\"Test containment glue to two package items.\"\"\"\n    pkg1 = create(PackageItem, UML.Package)\n    pkg2 = create(PackageItem, UML.Package)\n    containment = create(ContainmentItem)\n\n    glued = allow(containment, containment.head, pkg1)\n    assert glued\n\n    connect(containment, containment.head, pkg1)\n\n    glued = allow(containment, containment.tail, pkg2)\n    assert glued\n\n",
+    "perturbations": [
+      "def test_containment_package_glue(create): ...",
+      "def test_containment_package_glue(create): ...",
+      "def test_containment_package_glue(create): ...",
+      "def test_containment_package_glue(create): ...",
+      "def test_containment_package_glue(create): ..."
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Handling for multi-tenancy in sitemap.xml",
+    "code": "class DisplayableSitemap(Sitemap):\n    \"\"\"\n    Sitemap class for Django's sitemaps framework that returns\n    all published items for models that subclass ``Displayable``.\n    \"\"\"\n\n    def items(self):\n        \"\"\"\n        Return all published items for models that subclass\n        ``Displayable``, excluding those that point to external sites.\n        \"\"\"\n        # Fake homepage object.\n        home = Displayable()\n        setattr(home, \"get_absolute_url\", home_slug)\n        items = {home.get_absolute_url(): home}\n        for model in get_models():\n            if issubclass(model, Displayable):\n                for item in (model.objects.published()\n                             .exclude(slug__startswith=\"http://\")\n                             .exclude(slug__startswith=\"https://\")):\n                    items[item.get_absolute_url()] = item\n        return items.values()\n\n    def lastmod(self, obj):\n        if blog_installed and isinstance(obj, BlogPost):\n            return obj.publish_date\n\n    def get_urls(self, **kwargs):\n        \"\"\"\n        Ensure the correct host by injecting the current site.\n        \"\"\"\n        kwargs[\"site\"] = Site.objects.get(id=current_site_id())\n        return super(DisplayableSitemap, self).get_urls(**kwargs)",
+    "perturbations": [
+      "def items(self): return []",
+      "def items(self): return {1: 'example'}",
+      "def lastmod(self, obj): if True: return obj.publish_date",
+      "def get_urls(self, **kwargs): kwargs['site'] = Site.objects.get(id=current_site_id()) + 1",
+      "def get_urls(self, **kwargs): return super(DisplayableSitemap, self).get_urls(site=Site.objects.get(id='invalid_id'))"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Use the mint database for capsule data",
+    "code": "class CapsuleManager(manager.Manager):\n    def getIndexerConfig(self):\n        capsuleDataDir = util.joinPaths(self.cfg.dataPath, 'capsules')\n        cfg = rpath_capsule_indexer.IndexerConfig()\n        dbDriver = self.db.db.driver\n        dbConnectString = self.db.db.db.database\n        cfg.configLine(\"store %s:///%s\" % (dbDriver, dbConnectString))\n        cfg.configLine(\"indexDir %s/packages\" % capsuleDataDir)\n        cfg.configLine(\"systemsPath %s/systems\" % capsuleDataDir)\n        dataSources = self.db.platformMgr.listPlatformSources().platformSource\n        # XXX we only deal with RHN for now\n        if dataSources:\n            cfg.configLine(\"user RHN %s %s\" % (dataSources[0].username,\n                dataSources[0].password))\n        # XXX channels are hardcoded for now\n        cfg.configLine(\"channels rhel-i386-as-4\")\n        cfg.configLine(\"channels rhel-x86_64-as-4\")\n        cfg.configLine(\"channels rhel-i386-server-5\")\n        cfg.configLine(\"channels rhel-x86_64-server-5\")\n\n        util.mkdirChain(capsuleDataDir)\n        return cfg\n\n    def getIndexer(self):\n        cfg = self.getIndexerConfig()\n        return rpath_capsule_indexer.Indexer(cfg)",
+    "perturbations": [
+      "def getIndexerConfig(self): return rpath_capsule_indexer.IndexerConfig()",
+      "def getIndexerConfig(self): return rpath_capsule_indexer.IndexerConfig().configLine('store invalid:///%s' % self.db.db.database)",
+      "def getIndexerConfig(self): return rpath_capsule_indexer.IndexerConfig().configLine('indexDir %s/packages' % capsuleDataDir).configLine('systemsPath %s/systems' % capsuleDataDir)",
+      "def getIndexerConfig(self): return rpath_capsule_indexer.IndexerConfig().configLine('user RHN %s %s' % (dataSources[0].username, dataSources[1].password))",
+      "def getIndexerConfig(self): return rpath_capsule_indexer.IndexerConfig().configLine('channels rhel-i386-as-4').configLine('channels rhel-x86_64-server-5')"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "That awful inventory migration issue",
+    "code": "class Migration(migrations.Migration):\n\n    dependencies = [\n        ('inventory', '0001_initial'),\n    ]\n\n    operations = [\n        migrations.AddField(\n            model_name='item',\n            name='column',\n            field=models.IntegerField(null=True),\n        ),\n        migrations.AddField(\n            model_name='item',\n            name='row',\n            field=models.IntegerField(null=True),\n        ),\n    ]",
+    "perturbations": [
+      "def Migration(): ...",
+      "def add_column_to_item(model_name, column_type): ...",
+      "def add_row_to_item(model_name, row_type): ...",
+      "def update_item_data(item_id, new_value): ...",
+      "def delete_items_after_migration(date_threshold): ..."
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Print out bag contents for lidar and button topics",
+    "code": "def print_bag(bag):\n    topics = ['/scan', '/flagbutton_pressed']\n    for message in bag.read_messages(topics=topics):\n        print(message)\n\n",
+    "perturbations": [
+      "def print_bag(bag): ...",
+      "def print_bag(bag): for message in bag.read_messages(topics=['/scan', '/flagbutton_pressed']): print(message)",
+      "def print_bag(bag): for topic in topics: print(topic + ' contents: ' + str(bag.read_messages(topics=[topic])))",
+      "def print_bag(bag): for message in bag.read_messages(topics=topics): print('Contents of ' + topic + ': ' + str(message.data))",
+      "def print_bag(bag): for message in bag.read_messages(topics=['/scan', '/flagbutton_pressed']): print(message.content)"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Sort line coverage info when reporting",
+    "code": "def get_coverage_with_js(self):\n    report = orig_get_coverage(self)\n\n    js_files = json.load(open('.coverage-js'))['files']\n    js_report = []\n\n    for f in js_files:\n        source = '\\n'.join(open(f['filename']).readlines())\n        name = os.path.relpath(f['filename'])\n        coverage = []\n\n        # Create sorted coverage array from original dict\n        for k, v in sorted(f['source'].items(), key=lambda x:int(x[0])):\n            coverage.append(v['coverage'] if v['coverage'] != '' else None)\n\n        js_report.append({\n            'source': source,\n            'name': name,\n            'coverage': coverage}\n        )\n\n    report += js_report\n    return report\n",
+    "perturbations": [
+      "def get_coverage_with_js(self):\n    report = orig_get_coverage(self)\n\n    js_files = json.load(open('.coverage-js'))['files']\n    js_report = []\n\n    for f in js_files:\n        source = '\n'.join(open(f['filename']).readlines())\n        name = os.path.relpath(f['filename'])\n        coverage = []\n\n        # Create sorted coverage array from original dict\n        for k, v in sorted(f['source'].items(), key=lambda x:int(x[0])):\n            coverage.append(v['coverage'] if v['coverage'] != '' else None)\n\n        js_report.append({\n            'source': source,\n            'name': name,\n            'coverage': coverage}\n    }\n\n    report += js_report\n    return report",
+      "def get_coverage_with_js(self):\n    report = orig_get_coverage(self)\n\n    js_files = json.load(open('.coverage-js'))['files']\n    js_report = []\n\n    for f in js_files:\n        source = '\n'.join(open(f['filename']).readlines())\n        name = os.path.relpath(f['filename'])\n        coverage = []\n\n        # Create sorted coverage array from original dict\n        for k, v in sorted(f['source'].items(), key=lambda x:int(x[0])):\n            coverage.append(v['coverage'] if v['coverage'] != '' else None)\n\n        js_report.append({\n            'source': source,\n            'name': name,\n            'coverage': coverage}\n    }\n\n    report += js_report\n    return report",
+      "def get_coverage_with_js(self):\n    report = orig_get_coverage(self)\n\n    js_files = json.load(open('.coverage-js'))['files']\n    js_report = []\n\n    for f in js_files:\n        source = '\n'.join(open(f['filename']).readlines())\n        name = os.path.relpath(f['filename'])\n        coverage = []\n\n        # Create sorted coverage array from original dict\n        for k, v in sorted(f['source'].items(), key=lambda x:int(x[0])):\n            coverage.append(v['coverage'] if v['coverage'] != '' else None)\n\n        js_report.append({\n            'source': source,\n            'name': name,\n            'coverage': coverage}\n    }\n\n    report += js_report\n    return report",
+      "def get_coverage_with_js(self):\n    report = orig_get_coverage(self)\n\n    js_files = json.load(open('.coverage-js'))['files']\n    js_report = []\n\n    for f in js_files:\n        source = '\n'.join(open(f['filename']).readlines())\n        name = os.path.relpath(f['filename'])\n        coverage = []\n\n        # Create sorted coverage array from original dict\n        for k, v in sorted(f['source'].items(), key=lambda x:int(x[0])):\n            coverage.append(v['coverage'] if v['coverage'] != '' else None)\n\n        js_report.append({\n            'source': source,\n            'name': name,\n            'coverage': coverage}\n    }\n\n    report += js_report\n    return report",
+      "def get_coverage_with_js(self):\n    report = orig_get_coverage(self)\n\n    js_files = json.load(open('.coverage-js'))['files']\n    js_report = []\n\n    for f in js_files:\n        source = '\n'.join(open(f['filename']).readlines())\n        name = os.path.relpath(f['filename'])\n        coverage = []\n\n        # Create sorted coverage array from original dict\n        for k, v in sorted(f['source'].items(), key=lambda x:int(x[0])):\n            coverage.append(v['coverage'] if v['coverage'] != '' else None)\n\n        js_report.append({\n            'source': source,\n            'name': name,\n            'coverage': coverage}\n    }\n\n    report += js_report\n    return report"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Implement function to load data from directory",
+    "code": "def load_data(dir_doc):\n\tdocs = {}\n\tfor dirpath, dirnames, filenames in os.walk(dir_doc):\n\t\tfor name in filenames:\n\t\t\tfile = os.path.join(dirpath, name)\n\t\t\twith io.open(file, 'r+') as f:\n\t\t\t\tdocs[name] = f.read()\n\n\treturn docs\n",
+    "perturbations": [
+      "def load_data(dir_doc):\n    docs = {}\n    for dirpath, dirnames, filenames in os.walk(dir_doc):\n        for name in filenames:\n            file = os.path.join(dirpath, name)\n            with io.open(file, 'w+') as f:\n                docs[name] = f.read()\n\n    return docs",
+      "def load_data(dir_doc):\n    docs = {}\n    for dirpath, dirnames, filenames in os.walk(dir_doc):\n        for name in filenames:\n            file = os.path.join(dirpath, name)\n            with io.open(file, 'w+') as f:\n                docs[name] = f.write()\n\n    return docs",
+      "def load_data(dir_doc):\n    docs = {}\n    for dirpath, dirnames, filenames in os.walk(dir_doc):\n        for name in filenames:\n            file = os.path.join(dirpath, name)\n            with io.open(file, 'r+') as f:\n                docs[name] = f.write()\n\n    return docs",
+      "def load_data(dir_doc):\n    docs = {}\n    for dirpath, dirnames, filenames in os.walk(dir_doc):\n        for name in filenames:\n            file = os.path.join(dirpath, name)\n            with io.open(file, 'r+') as f:\n                docs[name] = f.read()\n\n    return dict(docs)",
+      "def load_data(dir_doc):\n    docs = {}\n    for dirpath, dirnames, filenames in os.walk(dir_doc):\n        for name in filenames:\n            file = os.path.join(dirpath, name)\n            with io.open(file, 'r+') as f:\n                docs[name] = f.read()\n\n    return [docs]"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "The PyPI version to 8.1.0.",
+    "code": "def read(fname):\n    try:\n        return open(os.path.join(os.path.dirname(__file__), fname)).read()\n    except:\n        return ''\n",
+    "perturbations": [
+      "def read(fname):\n    try:\n        return open(os.path.join(os.path.dirname(__file__), fname), 'w').read()\n    except:\n        return ''",
+      "def read(fname):\n    try:\n        return open(os.path.join(os.path.dirname(__file__), fname)).readline()\n    except:\n        return ''",
+      "def read(fname):\n    try:\n        return open(os.path.join(os.path.dirname(__file__), fname), 'rb').read().decode('utf-8')\n    except:\n        return ''",
+      "def read(fname):\n    try:\n        return open(os.path.join(os.path.dirname(__file__), fname)).readlines()\n    except:\n        return []",
+      "def read(fname):\n    try:\n        return open(os.path.join(os.path.dirname(__file__), fname), 'x').read()\n    except:\n        return ''"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "'bibpy.parsers' from package list",
+    "code": "def get_version(filename):\n    with open(filename) as fh:\n        for line in fh:\n            if line.startswith('__version__'):\n                return line.split('=')[-1].strip()[1:-1]\n\n",
+    "perturbations": [
+      "def get_version(filename):\n    with open(filename) as fh:\n        for line in fh:\n            if line.startswith('__version__'):\n                return line.split('=')[0].strip()[1:-1]",
+      "def get_version(filename):\n    with open(filename) as fh:\n        for line in fh:\n            if line.startswith('__version__'):\n                return line.split('=')[1].strip()[1:-1]",
+      "def get_version(filename):\n    with open(filename) as fh:\n        for line in fh:\n            if line.startswith('__version__'):\n                return line.split('=')[2].strip()[1:-1]",
+      "def get_version(filename):\n    with open(filename) as fh:\n        for line in fh:\n            if line.startswith('__version__'):\n                return line.split('=')[3].strip()[1:-1]",
+      "def get_version(filename):\n    with open(filename) as fh:\n        for line in fh:\n            if line.startswith('__version__'):\n                return line.split('=')[4].strip()[1:-1]"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Python 3 classifiers so users know this supports Python 3.",
+    "code": "def get_version():\n    \"\"\"\n    Get the version from version module without importing more than\n    necessary.\n    \"\"\"\n    version_module_path = os.path.join(os.path.dirname(__file__), \"eliot\",\n                                       \"_version.py\")\n\n    # The version module contains a variable called __version__\n    with open(version_module_path) as version_module:\n        exec(version_module.read())\n    return locals()[\"__version__\"]\n\n",
+    "perturbations": [
+      "def get_version(): return '0.0'",
+      "def get_version(): return '__version__'",
+      "def get_version(): version_module_path = os.path.join(os.path.dirname(__file__), \"eliot\", '_version.py') with open(version_module_path) as version_module:",
+      "     exec('print('hello world')')",
+      " return locals()['__version__']'",
+      "def get_version(): return '1.0' * 2",
+      "def get_version(): return None"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Set implicit loop for Python <3.6",
+    "code": "class Tasks:\n    loop = asyncio.new_event_loop()\n\n    @classmethod\n    def _run(cls):\n        asyncio.set_event_loop(cls.loop)\n\n        try:\n            cls.loop.run_forever()\n        finally:\n            cls.loop.close()\n\n    @classmethod\n    def do(cls, func, *args, **kwargs):\n        cls.loop.call_soon(lambda: func(*args, **kwargs))\n        cls.loop._write_to_self()\n\n    @classmethod\n    def later(cls, func, *args, after=None, **kwargs):\n        cls.loop.call_later(after, lambda: func(*args, **kwargs))\n        cls.loop._write_to_self()\n\n    @classmethod\n    def periodic(cls, func, *args, interval=None, **kwargs):\n        @asyncio.coroutine\n        def f():\n            while True:\n                yield from asyncio.sleep(interval)\n                func(*args, **kwargs)\n\n        cls.loop.create_task(f())\n        cls.loop._write_to_self()\n\n",
+    "perturbations": [
+      "def Tasks.do(cls, func, *args, **kwargs):\n    cls.loop.call_soon(lambda: func(*args))\n    cls.loop._write_to_self()",
+      "def Tasks.later(cls, func, *args, after=None, **kwargs):\n    cls.loop.call_later(after, lambda: func(*args))\n    cls.loop._write_to_self()",
+      "def Tasks.periodic(cls, func, *args, interval=None, **kwargs):\n    @asyncio.coroutine\n    def f():\n        while True:\n            yield from asyncio.sleep(interval)\n            func(*args, **kwargs)\n\n    cls.loop.create_task(f())\n    cls.loop._write_to_self()",
+      "def Tasks.do(cls, func, *args, **kwargs):\n    cls.loop.call_soon(lambda: func(*args))\n    cls.loop._write_to_self()",
+      "def Tasks.later(cls, func, *args, after=None, **kwargs):\n    cls.loop.call_later(after, lambda: func(*args))\n    cls.loop._write_to_self()"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Handling of which on Windows",
+    "code": "def which(filename):\n    '''This takes a given filename; tries to find it in the environment path;\n    then checks if it is executable. This returns the full path to the filename\n    if found and executable. Otherwise this returns None.'''\n\n    # Special case where filename contains an explicit path.\n    if os.path.dirname(filename) != '' and is_executable_file(filename):\n        return filename\n    if 'PATH' not in os.environ or os.environ['PATH'] == '':\n        p = os.defpath\n    else:\n        p = os.environ['PATH']\n    pathlist = p.split(os.pathsep)\n    for path in pathlist:\n        ff = os.path.join(path, filename)\n        if pty:\n            if is_executable_file(ff):\n                return ff\n        else:\n            pathext = os.environ.get('Pathext', '.exe;.com;.bat;.cmd')\n            pathext = pathext.split(os.pathsep) + ['']\n            for ext in pathext:\n                if os.access(ff + ext, os.X_OK):\n                    return ff + ext\n    return None",
+    "perturbations": [
+      "def which(filename):\n    return filename",
+      "def which(filename):\n    return None",
+      "def which(filename):\n    pathlist = os.environ['PATH']\n    for path in pathlist:\n        ff = os.path.join(path, filename)\n        if is_executable_file(ff):\n            return ff\n    return 'not found'",
+      "def which(filename):\n    p = os.defpath\n    pathlist = p.split(os.pathsep)\n    for path in pathlist:\n        ff = os.path.join(path, filename)\n        if not os.access(ff, os.X_OK):\n            continue\n        return ff\n    return None",
+      "def which(filename):\n    return 'not executable'"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "'provider location' as a searchable field for Images",
+    "code": "class ImageViewSet(MultipleFieldLookup, AuthOptionalViewSet):\n\n    \"\"\"\n    API endpoint that allows images to be viewed or edited.\n    \"\"\"\n    lookup_fields = (\"id\", \"uuid\")\n\n    http_method_names = ['get', 'put', 'patch', 'head', 'options', 'trace']\n\n    filter_fields = ('created_by__username', 'tags__name', 'projects__id')\n\n    permission_classes = (permissions.InMaintenance,\n                          permissions.ApiAuthOptional,\n                          permissions.CanEditOrReadOnly,\n                          permissions.ApplicationMemberOrReadOnly)\n\n    serializer_class = ImageSerializer\n\n    search_fields = ('id', 'name', 'versions__change_log', 'tags__name',\n                     'tags__description', 'created_by__username', 'versions__machines__instance_source__provider__location')\n\n    def get_queryset(self):\n        request_user = self.request.user\n        return Image.current_apps(request_user)",
+    "perturbations": [
+      "def get_queryset(self): return Image.current_apps('wrong')",
+      "def get_queryset(self): return Image.all_apps(request_user)",
+      "def get_queryset(self): return Image.apps_by_location('wrong', request_user)",
+      "def get_queryset(self): return Image.query_set.filter(id=None)",
+      "def get_queryset(self): return Image.objects.none()"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Initialize final subclass of LanguageHandler",
+    "code": "class LanguageHandler(metaclass=abc.ABCMeta):\n    on_start = None  # type: Optional[Callable]\n    on_initialized = None  # type: Optional[Callable]\n\n    @abc.abstractproperty\n    def name(self) -> str:\n        raise NotImplementedError\n\n    @abc.abstractproperty\n    def config(self) -> ClientConfig:\n        raise NotImplementedError\n\n    @classmethod\n    def instantiate_all(cls) -> 'List[LanguageHandler]':\n        def get_final_subclasses(derived: 'List[Type[LanguageHandler]]',\n                                 results: 'List[Type[LanguageHandler]]') -> None:\n            for d in derived:\n                d_subclasses = d.__subclasses__()\n                if len(d_subclasses) > 0:\n                    get_final_subclasses(d_subclasses, results)\n                else:\n                    results.append(d)\n\n        subclasses = []  # type: List[Type[LanguageHandler]]\n        get_final_subclasses(cls.__subclasses__(), subclasses)\n        instantiated = []\n        for c in subclasses:\n            try:\n                instantiated.append(instantiate(c))\n            except Exception as e:\n                debug('LanguageHandler instantiation crashed!', e)\n        return instantiated\n\n",
+    "perturbations": [
+      "def LanguageHandler.instantiate_all(cls) -> 'List[LanguageHandler]':\n    def get_final_subclasses(derived: 'List[Type[LanguageHandler]]',\n                                 results: 'List[Type[LanguageHandler]]') -> None:\n        for d in derived:\n            d_subclasses = d.__subclasses__()\n            if len(d_subclasses) > 0:\n                get_final_subclasses(d_subclasses, results)\n            else:\n                results.append(d)\n\n    subclasses = []  # type: List[Type[LanguageHandler]]\n    get_final_subclasses(cls.__subclasses__(), subclasses)\n    instantiated = []\n    for c in subclasses:\n        try:\n            instantiated.append(instantiate(c))\n        except Exception as e:\n            debug('LanguageHandler instantiation crashed!', e)\n    return instantiated",
+      "def LanguageHandler.instantiate_all(cls) -> 'List[LanguageHandler]':\n    def get_final_subclasses(derived: 'List[Type[LanguageHandler]]',\n                                 results: 'List[Type[LanguageHandler]]') -> None:\n        for d in derived:\n            d_subclasses = d.__subclasses__()\n            if len(d_subclasses) > 0:\n                get_final_subclasses(d_subclasses, results)\n            else:\n                results.append(d)\n\n    subclasses = []  # type: List[Type[LanguageHandler]]\n    get_final_subclasses(cls.__subclasses__(), subclasses)\n    instantiated = []\n    for c in subclasses:\n        try:\n            instantiated.append(instantiate(c))\n        except Exception as e:\n            debug('LanguageHandler instantiation crashed!', e)\n    return instantiated",
+      "def LanguageHandler.instantiate_all(cls) -> 'List[LanguageHandler]':\n    def get_final_subclasses(derived: 'List[Type[LanguageHandler]]',\n                                 results: 'List[Type[LanguageHandler]]') -> None:\n        for d in derived:\n            d_subclasses = d.__subclasses__()\n            if len(d_subclasses) > 0:\n                get_final_subclasses(d_subclasses, results)\n            else:\n                results.append(d)\n\n    subclasses = []  # type: List[Type[LanguageHandler]]\n    get_final_subclasses(cls.__subclasses__(), subclasses)\n    instantiated = []\n    for c in subclasses:\n        try:\n            instantiated.append(instantiate(c))\n        except Exception as e:\n            debug('LanguageHandler instantiation crashed!', e)\n    return instantiated",
+      "def LanguageHandler.instantiate_all(cls) -> 'List[LanguageHandler]':\n    def get_final_subclasses(derived: 'List[Type[LanguageHandler]]',\n                                 results: 'List[Type[LanguageHandler]]') -> None:\n        for d in derived:\n            d_subclasses = d.__subclasses__()\n            if len(d_subclasses) > 0:\n                get_final_subclasses(d_subclasses, results)\n            else:\n                results.append(d)\n\n    subclasses = []  # type: List[Type[LanguageHandler]]\n    get_final_subclasses(cls.__subclasses__(), subclasses)\n    instantiated = []\n    for c in subclasses:\n        try:\n            instantiated.append(instantiate(c))\n        except Exception as e:\n            debug('LanguageHandler instantiation crashed!', e)\n    return instantiated",
+      "def LanguageHandler.instantiate_all(cls) -> 'List[LanguageHandler]':\n    def get_final_subclasses(derived: 'List[Type[LanguageHandler]]',\n                                 results: 'List[Type[LanguageHandler]]') -> None:\n        for d in derived:\n            d_subclasses = d.__subclasses__()\n            if len(d_subclasses) > 0:\n                get_final_subclasses(d_subclasses, results)\n            else:\n                results.append(d)\n\n    subclasses = []  # type: List[Type[LanguageHandler]]\n    get_final_subclasses(cls.__subclasses__(), subclasses)\n    instantiated = []\n    for c in subclasses:\n        try:\n            instantiated.append(instantiate(c))\n        except Exception as e:\n            debug('LanguageHandler instantiation crashed!', e)\n    return instantiated"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  },
+  {
+    "specification": "Vx.expose so it works when a name is passed",
+    "code": "def _expose(f=None, name=None):\n    if name is None:\n        name = f.__name__.lstrip('_')\n    if getattr(vx, name, None) is not None:\n        raise AttributeError(\"Cannot expose duplicate name: '{}'\".format(name))\n    if f is None:\n        def g(f):\n            setattr(vx, name, f)\n            return f\n        return g\n    setattr(vx, name, f)\n    return f",
+    "perturbations": [
+      "def _expose(f=None, name=None):\n    if name is None:\n        name = f.__name__.lstrip('_')\n    if getattr(vx, 'wrong_name', None) is not None:\n        raise AttributeError('Cannot expose duplicate name: 'wrong_name'')\n    setattr(vx, name, f)\n    return f",
+      "def _expose(f=None, name=None):\n    if name is None:\n        name = f.__name__.lstrip('_')\n    if getattr(vx, name, None) == 'wrong_value':\n        raise AttributeError('Cannot expose duplicate name: 'wrong_name'')\n    setattr(vx, name, f)\n    return f",
+      "def _expose(f=None, name=None):\n    if name is None:\n        name = f.__name__.lstrip('_')\n    if getattr(vx, 'wrong_value', None) != 'right_value':\n        raise AttributeError('Cannot expose duplicate name: 'wrong_name'')\n    setattr(vx, name, f)\n    return f",
+      "def _expose(f=None, name=None):\n    if name is None:\n        name = f.__name__.lstrip('_')\n    if getattr(vx, name, 'wrong_value') == 'right_value':\n        raise AttributeError('Cannot expose duplicate name: 'wrong_name'')\n    setattr(vx, name, f)\n    return f",
+      "def _expose(f=None, name=None):\n    if name is None:\n        name = f.__name__.lstrip('_')\n    if getattr(vx, 'wrong_value', None) != 'right_value':\n        raise AttributeError('Cannot expose duplicate name: 'wrong_name'')\n    setattr(vx, name, 'wrong_value')\n    return f"
+    ],
+    "perturbation_categories": [
+      "Logic errors",
+      "Boundary errors",
+      "Type errors",
+      "Incomplete implementations",
+      "Performance bugs"
+    ]
+  }
+]
